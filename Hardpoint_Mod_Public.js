@@ -132,14 +132,15 @@ var pointObj = {
 };
 
 var soundtracks = ["procedurality.mp3","warp_drive.mp3","crystals.mp3","red_mist.mp3","civilisation.mp3","argon.mp3"];
-var playerCount = 4; // number of players to wait for before game start
+var playerCount = 8; // number of players to wait for before game start
 var crystalsToGive = 0.75; // multiplier on max crystals to give to ship when it respawns
 var mapSize = 90;
-var gameLength = 1800; // in seconds
+var gameLength = 720; // in seconds
 var gameLeft = JSON.parse(JSON.stringify(gameLength)); 
 var pointsPerUnit = 10;
 var pointTimeUnit = 60; // in ticks
-var teamChooseLength = 75; // in seconds
+var teamChooseLength = 60; // in seconds
+var gameOverLobbyLength = 30; // in seconds
 
 var hues = [[0,180],[20,240],[180,300],[120,280],[140,300]];
 var hueNames = {
@@ -410,20 +411,21 @@ var waiting = function(game) {
 
 var teamChoose = function(game) {
   if (game.step - stepAdjust >= teamChooseLength * 60) {
+    setTeams(game);
     for (let ship of game.ships) {
       addToUIQueue(ship,{id:"team_choose_countdown",visible:false});
       addToUIQueue(ship,{id:"team_choose_button_0",visible:false});
       addToUIQueue(ship,{id:"team_choose_button_1",visible:false});
+      addToUIQueue(ship,{id:"leave_team",visible:false});
       addToUIQueue(ship,{id:"team_list_0",visible:false});
       addToUIQueue(ship,{id:"team_list_1",visible:false});
       addToUIQueue(ship,startMessage);
       ship.set({idle:false,collider:true,x:spawns[ship.team][0],y:spawns[ship.team][1],vx:0,vy:0});
       setTimeout(() => {
         addToUIQueue(ship,{id:"start_message",visible:false});
-      },3500);
+      },4000);
     }
     stepAdjust = game.step;
-    setTeams(game);
     modding.terminal.error("GAME: Starting game!");
     changePoint(game);
     this.tick = mainGame;
@@ -554,11 +556,14 @@ var gameOver = function(game) {
     endMessage["Kills"] = ship.custom.kills;
     endMessage["Deaths"] = ship.custom.deaths;
     endMessage[""] = "";
-    endMessage[`Best objective point gatherer on ${winnerColor} team`] = `${bestObjectives[teamScores.indexOf(Math.max(teamScores)) * 2]} with ${bestObjectives[teamScores.indexOf(Math.max(teamScores)) * 2 + 1]} kills`;
-    endMessage[`Best objective point gatherer on ${loserColor} team`] = `${bestObjectives[teamScores.indexOf(Math.min(teamScores)) * 2]} with ${bestObjectives[teamScores.indexOf(Math.min(teamScores)) * 2 + 1]} kills`;
+    endMessage[`Best objective point gatherer on ${winnerColor} team`] = `${bestObjectives[teamScores.indexOf(Math.max(teamScores)) * 2]} with ${bestObjectives[teamScores.indexOf(Math.max(teamScores)) * 2 + 1]} points`;
+    endMessage[`Best objective point gatherer on ${loserColor} team`] = `${bestObjectives[teamScores.indexOf(Math.min(teamScores)) * 2]} with ${bestObjectives[teamScores.indexOf(Math.min(teamScores)) * 2 + 1]} points`;
     endMessage[`Best killer on ${winnerColor} team`] = `${bestKillers[teamScores.indexOf(Math.max(teamScores)) * 2]} with ${bestKillers[teamScores.indexOf(Math.max(teamScores)) * 2 + 1]} kills`;
     endMessage[`Best killer on ${loserColor} team`] = `${bestKillers[teamScores.indexOf(Math.min(teamScores)) * 2]} with ${bestKillers[teamScores.indexOf(Math.min(teamScores)) * 2 + 1]} kills`;
-    ship.gameover(endMessage);
+    ship.set({idle:true,collider:false,x:(game.ships.indexOf(ship) - (game.ships.length - 1) / 2) * 12,y:0,vx:0,vy:0,angle:90});
+    setTimeout(() => {
+      ship.gameover(endMessage);
+    },gameOverLobbyLength * 1000);
   }
 };
 
@@ -778,6 +783,7 @@ this.options = {
   weapons_store: false,
   vocabulary: vocabulary,
   starting_ship: 801,
+  speed_mod: 1.25
 };
 
 this.event = function(event,game) {
