@@ -106,22 +106,22 @@ const shipSets = {
 };
 
 const vocabulary = [
-  {"text":"You","icon":"\u004e","key":"O"},
-  {"text":"Me","icon":"\u004f","key":"E"},
-  {"text":"Yes","icon":"\u004c","key":"Y"},
-  {"text":"No","icon":"\u004d","key":"N"},
-  {"text":"Mine","icon":"\u0044","key":"M"},
-  {"text":"Follow","icon":"\u0050","key":"F"},
-  {"text":"Attack","icon":"\u0049","key":"A"},
-  {"text":"Defend","icon":"\u0025","key":"D"},
-  {"text":"Wait","icon":"\u0048","key":"T"},
-  {"text":"Kill","icon":"\u005b","key":"K"},
-  {"text":"Base","icon":"\u0034","key":"B"},
-  {"text":"Hmm","icon":"\u004b","key":"Q"},
-  {"text":"Good Game","icon":"\u00a3","key":"G"},
-  {"text":"No Prob","icon":"\u0047","key":"P"},
-  {"text":"Thanks","icon":"\u0041","key":"X"},
-  {"text":"Sorry","icon":"\u00a1","key":"S"}
+  { "text": "You", "icon": "\u004e", "key": "O" },
+  { "text": "Me", "icon": "\u004f", "key": "E" },
+  { "text": "Yes", "icon": "\u004c", "key": "Y" },
+  { "text": "No", "icon": "\u004d", "key": "N" },
+  { "text": "Mine", "icon": "\u0044", "key": "M" },
+  { "text": "Follow", "icon": "\u0050", "key": "F" },
+  { "text": "Attack", "icon": "\u0049", "key": "A" },
+  { "text": "Defend", "icon": "\u0025", "key": "D" },
+  { "text": "Wait", "icon": "\u0048", "key": "T" },
+  { "text": "Kill", "icon": "\u005b", "key": "K" },
+  { "text": "Point", "icon": "\u002b", "key": "B" },
+  { "text": "Hmm", "icon": "\u004b", "key": "Q" },
+  { "text": "Good Game", "icon": "\u00a3", "key": "G" },
+  { "text": "No Prob", "icon": "\u0047", "key": "P" },
+  { "text": "Thanks", "icon": "\u0041", "key": "X" },
+  { "text": "Sorry", "icon": "\u00a1", "key": "S" }
 ];
 
 var pointObj = {
@@ -131,36 +131,36 @@ var pointObj = {
   diffuseColor: 0xEEEA5D
 };
 
-var soundtracks = ["procedurality.mp3","warp_drive.mp3","crystals.mp3","red_mist.mp3","civilisation.mp3","argon.mp3"];
-var playerCount = 8; // number of players to wait for before game start
+var soundtracks = ["procedurality.mp3", "warp_drive.mp3", "crystals.mp3", "red_mist.mp3", "civilisation.mp3", "argon.mp3"];
+var playerCount = 3; // number of players to wait for before game start, this will be rounded up to the nearest even number.
 var crystalsToGive = 0.75; // multiplier on max crystals to give to ship when it respawns
 var mapSize = 90;
 var gameLength = 720; // in seconds
-var gameLeft = JSON.parse(JSON.stringify(gameLength)); 
+var gameLeft = JSON.parse(JSON.stringify(gameLength));
 var pointsPerUnit = 10;
 var pointTimeUnit = 60; // in ticks
-var teamChooseLength = 60; // in seconds
+var teamChooseLength = 30; // in seconds
 var gameOverLobbyLength = 30; // in seconds
 
-var hues = [[0,180],[20,240],[180,300],[120,280],[140,300]];
+var hues = [[0, 180], [20, 240], [180, 300], [120, 280], [140, 300]];
 var hueNames = {
-  "Red":0,
-  "Orange":20,
-  "Green":120,
-  "Teal":140,
-  "Cyan":180,
-  "Blue":240,
-  "Magenta":280,
-  "Pink":300
+  "Red": 0,
+  "Orange": 20,
+  "Green": 120,
+  "Teal": 140,
+  "Cyan": 180,
+  "Blue": 240,
+  "Magenta": 280,
+  "Pink": 300
 };
-var teamScores = [0,0];
-var teamCounts = [0,0];
+var teamScores = [0, 0];
+var teamCounts = [0, 0];
 
-var spawns = [[-mapSize * 3,0],[mapSize * 3,0]];
-var spawnSize = [60,60];
+var spawns = [[-mapSize * 3, 0], [mapSize * 3, 0]];
+var spawnSize = [60, 60];
 
-var pointLocs = [[-mapSize,mapSize * 1.5],[mapSize,-mapSize * 1.5],[-mapSize,-mapSize * 1.5],[mapSize,mapSize * 1.5]];
-var pointSize = [80,80];
+var pointLocs = [[-mapSize, mapSize * 1.5], [mapSize, -mapSize * 1.5], [-mapSize, -mapSize * 1.5], [mapSize, mapSize * 1.5]];
+var pointSize = [80, 80];
 var pointsSoFar = 0;
 
 var stepAdjust, timeToPointChange;
@@ -179,138 +179,138 @@ var radarBackground = {
 
 var creditsUI = {
   id: "creditsUI",
-  position: [5,87,50,8],
+  position: [5, 87, 50, 8],
   visible: true,
   clickable: false,
   components: [
-    {type:"text",position:[0,0,100,60],value:"Ship set: ",color:"#fff",align:"left"},
-    {type:"text",position:[0,65,100,35],value:"by ",color:"#fff",align:"left"}
-    ]
+    { type: "text", position: [0, 0, 100, 60], value: "Ship set: ", color: "#fff", align: "left" },
+    { type: "text", position: [0, 65, 100, 35], value: "by ", color: "#fff", align: "left" }
+  ]
 };
 
 var waitingMessage = {
   id: "waiting_message",
-  position: [30,15,40,15],
+  position: [30, 15, 40, 15],
   visible: true,
   clickable: false,
   components: [
-    {type:"text",position:[0,0,100,40],value:`${playerCount} players needed to start match...`,color:"#fff",align:"center"},
-    {type:"text",position:[0,50,100,30],value:"",color:"#fff",align:"center"}
-    ]
+    { type: "text", position: [0, 0, 100, 40], value: `${Math.floor(playerCount) % 2 === 0 ? Math.floor(playerCount) : Math.floor(playerCount) + 1} players needed to start match...`, color: "#fff", align: "center" },
+    { type: "text", position: [0, 50, 100, 30], value: "", color: "#fff", align: "center" }
+  ]
 };
 
 var teamChooseCountdown = {
   id: "team_choose_countdown",
-  position: [40,10,20,10],
+  position: [40, 10, 20, 10],
   visible: true,
   components: [
-    {type:"text",position:[0,0,100,35],value:"Time left to choose your team:",color:"#fff",align:"center"},
-    {type:"text",position:[0,40,100,60],value:"",color:"#fff",align:"center"}
-    ]
+    { type: "text", position: [0, 0, 100, 35], value: "Time left to choose your team:", color: "#fff", align: "center" },
+    { type: "text", position: [0, 40, 100, 60], value: "", color: "#fff", align: "center" }
+  ]
 };
 
 var teamChooseButtons = [
   {
     id: "team_choose_button_0",
-    position: [32,75,11,5],
+    position: [32, 75, 11, 5],
     visible: true,
     clickable: true,
     shortcut: "0",
     components: [
-      {type:"box",position:[0,0,100,100],width:2,stroke:"#c0d0e0dd"},
-      {type:"text",position:[5,5,20,90],value:"[0]",color:"#fff",align:"center"},
-      {type:"text",position:[30,10,65,80],value:"Join team",color:"#fff",align:"center"}
-      ]
+      { type: "box", position: [0, 0, 100, 100], width: 2, stroke: "#c0d0e0dd" },
+      { type: "text", position: [5, 5, 20, 90], value: "[0]", color: "#fff", align: "center" },
+      { type: "text", position: [30, 10, 65, 80], value: "Join team", color: "#fff", align: "center" }
+    ]
   },
   {
     id: "team_choose_button_1",
-    position: [57,75,11,5],
+    position: [57, 75, 11, 5],
     visible: true,
     clickable: true,
     shortcut: "1",
     components: [
-      {type:"box",position:[0,0,100,100],width:2,stroke:"#c0d0e0dd"},
-      {type:"text",position:[5,5,20,90],value:"[1]",color:"#fff",align:"center"},
-      {type:"text",position:[30,10,65,80],value:"Join team",color:"#fff",align:"center"}
-      ]
+      { type: "box", position: [0, 0, 100, 100], width: 2, stroke: "#c0d0e0dd" },
+      { type: "text", position: [5, 5, 20, 90], value: "[1]", color: "#fff", align: "center" },
+      { type: "text", position: [30, 10, 65, 80], value: "Join team", color: "#fff", align: "center" }
+    ]
   },
   {
     id: "leave_team",
-    position: [45,75,10,5],
+    position: [45, 75, 10, 5],
     visible: true,
     clickable: true,
     shortcut: "L",
     components: [
-      {type:"box",position:[0,0,100,100],width:2,stroke:"#c0d0e0dd"},
-      {type:"text",position:[5,5,20,90],value:"[L]",color:"#fff",align:"center"},
-      {type:"text",position:[30,10,65,80],value:"Leave team",color:"#fff",align:"center"}
-      ]
+      { type: "box", position: [0, 0, 100, 100], width: 2, stroke: "#c0d0e0dd" },
+      { type: "text", position: [5, 5, 20, 90], value: "[L]", color: "#fff", align: "center" },
+      { type: "text", position: [30, 10, 65, 80], value: "Leave team", color: "#fff", align: "center" }
+    ]
   }
 ];
 
 var teamLists = [
   {
     id: "team_list_0",
-    position: [30,25,15,45],
+    position: [30, 25, 15, 45],
     visible: true,
     components: [
-      {type:"box",position:[0,0,100,100],width:2,stroke:"#c0d0e0dd"},
-      {type:"text",position:[5,5,90,10],value:"",color:"#fff",align:"center"},
-      ]
+      { type: "box", position: [0, 0, 100, 100], width: 2, stroke: "#c0d0e0dd" },
+      { type: "text", position: [5, 5, 90, 10], value: "", color: "#fff", align: "center" },
+    ]
   },
   {
     id: "team_list_1",
-    position: [55,25,15,45],
+    position: [55, 25, 15, 45],
     visible: true,
     components: [
-      {type:"box",position:[0,0,100,100],width:2,stroke:"#c0d0e0dd"},
-      {type:"text",position:[5,5,90,10],value:"",color:"#fff",align:"center"},
-      ]
+      { type: "box", position: [0, 0, 100, 100], width: 2, stroke: "#c0d0e0dd" },
+      { type: "text", position: [5, 5, 90, 10], value: "", color: "#fff", align: "center" },
+    ]
   }
 ];
 
 var teamFull = {
   id: "team_full",
-  position: [47,40,6,4],
+  position: [46, 40, 8, 4],
   visible: true,
   components: [
-    {type:"text",position:[0,0,100,100],value:"Team is full",color:"#fff",align:"center"},
-    ]
+    { type: "text", position: [0, 0, 100, 100], value: "Team is full", color: "#fff", align: "center" },
+  ]
 };
 
 var startMessage = {
   id: "start_message",
-  position: [40,30,20,10],
+  position: [40, 30, 20, 10],
   visible: true,
   components: [
-    {type:"text",position:[0,0,100,100],value:"GO!",color:"#fff",align:"center"},
-    ]
+    { type: "text", position: [0, 0, 100, 100], value: "GO!", color: "#fff", align: "center" },
+  ]
 };
 
 var showShipChoicesButton = {
   id: "ship_choose_button",
-  position: [3,35,8,10],
+  position: [3, 35, 8, 10],
   visible: true,
   clickable: true,
   shortcut: "C",
   components: [
-    {type:"box",position:[0,0,100,100],width:2,stroke:"#c0d0e0dd",fill:"#040506dd"},
-    {type:"text",position:[5,5,95,60],value:"[C]",color:"#fff",align:"center"},
-    {type:"text",position:[0,70,100,25],value:"Choose Ship",color:"#fff",align:"center"}
-    ]
+    { type: "box", position: [0, 0, 100, 100], width: 2, stroke: "#c0d0e0dd", fill: "#040506dd" },
+    { type: "text", position: [5, 5, 95, 60], value: "[C]", color: "#fff", align: "center" },
+    { type: "text", position: [0, 70, 100, 25], value: "Choose Ship", color: "#fff", align: "center" }
+  ]
 };
 
 var hideShipChoicesButton = {
   id: "ship_choose_button",
-  position: [3,35,8,10],
+  position: [3, 35, 8, 10],
   visible: true,
   clickable: true,
   shortcut: "C",
   components: [
-    {type:"box",position:[0,0,100,100],width:2,stroke:"#c0d0e0dd",fill:"#040506dd"},
-    {type:"text",position:[5,8,95,60],value:"[C]",color:"#fff",align:"center"},
-    {type:"text",position:[0,70,100,25],value:"Hide Ship Choices",color:"#fff",align:"center"}
-    ]
+    { type: "box", position: [0, 0, 100, 100], width: 2, stroke: "#c0d0e0dd", fill: "#040506dd" },
+    { type: "text", position: [5, 8, 95, 60], value: "[C]", color: "#fff", align: "center" },
+    { type: "text", position: [0, 70, 100, 25], value: "Hide Ship Choices", color: "#fff", align: "center" }
+  ]
 };
 
 var shipChooseTemplate = {
@@ -320,11 +320,11 @@ var shipChooseTemplate = {
   clickable: true,
   shortcut: "",
   components: [
-    {type:"box",position:[0,0,100,100],width:2,stroke:"#c0d0e0dd",fill:""},
-    {type:"text",position:[5,5,90,55],value:"Ship class",color:"#fff",align:"center"},
-    {type:"text",position:[5,58,90,37],value:"Ship name",color:"#fff",align:"center"},
-    {type:"text",position:[3,5,30,85],value:"Shortcut",color:"#fff",align:"left"}
-    ],
+    { type: "box", position: [0, 0, 100, 100], width: 2, stroke: "#c0d0e0dd", fill: "" },
+    { type: "text", position: [5, 5, 90, 55], value: "Ship class", color: "#fff", align: "center" },
+    { type: "text", position: [5, 58, 90, 37], value: "Ship name", color: "#fff", align: "center" },
+    { type: "text", position: [3, 5, 30, 85], value: "Shortcut", color: "#fff", align: "left" }
+  ],
   totalHeight: 50,
   totalWidth: 25,
   topOffset: 30
@@ -332,57 +332,67 @@ var shipChooseTemplate = {
 
 var teamInfo = {
   id: "team_info",
-  position: [0,0,100,100],
+  position: [0, 0, 100, 100],
   visible: true,
   components: [
-    {type:"text",position:[40,15,8,8],value:"0",color:"",align:"right"},
-    {type:"text",position:[52,15,85,8],value:"0",color:"",align:"left"},
-    {type:"text",position:[48,15,4,8],value:"-",color:"#fff",align:"center"},
-    {type:"text",position:[1,50,20,5],value:"",color:"#fff",align:"left"},
-    {type:"text",position:[1,55,20,3],value:"",color:"#fff",align:"left"}
-    ]
+    { type: "text", position: [40, 15, 8, 8], value: "0", color: "", align: "right" },
+    { type: "text", position: [52, 15, 85, 8], value: "0", color: "", align: "left" },
+    { type: "text", position: [48, 15, 4, 8], value: "-", color: "#fff", align: "center" },
+    { type: "text", position: [1, 50, 20, 5], value: "", color: "#fff", align: "left" },
+    { type: "text", position: [1, 55, 20, 3], value: "", color: "#fff", align: "left" }
+  ]
 };
 
 var objectivePoints = {
   id: "objective_points",
-  position: [44,30,10,7],
+  position: [44, 30, 10, 7],
   visible: true,
   components: [
-    {type:"text",position:[0,0,100,100],value:`+${pointsPerUnit}`,color:"#eeea5d",align:"center"}
-    ]
+    { type: "text", position: [0, 0, 100, 100], value: `+${pointsPerUnit}`, color: "#eeea5d", align: "center" }
+  ]
+};
+
+var gameOverUI = {
+  id: "game_over",
+  position: [0, 0, 100, 100],
+  visible: true,
+  components: [
+    { type: "text", position: [30, 25, 20, 7], value: "", color: "", align: "right" },
+    { type: "text", position: [50, 25, 20, 7], value: "team wins!", color: "#fff", align: "left" },
+    { type: "text", position: [30, 34, 20, 5], value: "Well played, team", color: "", align: "right" },
+    { type: "text", position: [50, 34, 20, 5], value: " ", color: "", align: "left" },
+  ]
 };
 
 // Utility functions
 
-var randomChoice = function(obj) {
+var randomChoice = function (obj) {
   if (typeof obj == "object") {
     let choice = Object.keys(obj) ? Object.keys(obj)[Math.floor(Math.random() * Object.keys(obj).length)] : Math.floor(Math.random() * obj.length);
     return choice;
-  } else {
-    modding.terminal.error(`randomChoice(${obj}) at step ${game.step}: wrong type.`);
   }
 };
 
-var formatTime = function(t) { // format to minutes:seconds with two digits for seconds
-  let seconds = (t % 60).toString().padStart(2,"0");
+var formatTime = function (t) { // format to minutes:seconds with two digits for seconds
+  let seconds = (t % 60).toString().padStart(2, "0");
   let minutes = ((t - seconds) / 60).toString();
   return minutes + ":" + seconds;
 };
 
-var isInRange = function(a,b,c) {
-  return Math.min(a,b) <= c && c <= Math.max(a,b); // inclusive of both a and b
+var isInRange = function (a, b, c) {
+  return Math.min(a, b) <= c && c <= Math.max(a, b); // inclusive of both a and b
 };
 
 
 // Game functions
 
-var waiting = function(game) {
+var waiting = function (game) {
   if (game.step % 20 === 0) {
     waitingMessage.components[1].value = `Players: ${game.ships.length}/${playerCount}`;
     if (game.ships.length === playerCount) {
       modding.terminal.error("GAME: Enough ships are here");
       for (let ship of game.ships) {
-        addToUIQueue(ship,{id:"waiting_message",visible:false});
+        addToUIQueue(ship, { id: "waiting_message", visible: false });
         setShipUI(ship);
       }
       teamChooseButtons[0].components[0].fill = `hsla(${roundOptions.hues[0]},100%,25%,0.9)`;
@@ -401,29 +411,29 @@ var waiting = function(game) {
       this.tick = teamChoose;
     } else {
       for (let ship of game.ships) {
-        ship.set({idle:true,collider:false,x:(game.ships.indexOf(ship) - (game.ships.length - 1) / 2) * 12,y:0,vx:0,vy:0,angle:90,hue:60});
-        addToUIQueue(ship,waitingMessage);
+        ship.set({ idle: true, collider: false, x: (game.ships.indexOf(ship) - (game.ships.length - 1) / 2) * 12, y: 0, vx: 0, vy: 0, angle: 90, hue: 60 });
+        addToUIQueue(ship, waitingMessage);
         setShipUI(ship);
       }
     }
   }
 };
 
-var teamChoose = function(game) {
+var teamChoose = function (game) {
   if (game.step - stepAdjust >= teamChooseLength * 60) {
     setTeams(game);
     for (let ship of game.ships) {
-      addToUIQueue(ship,{id:"team_choose_countdown",visible:false});
-      addToUIQueue(ship,{id:"team_choose_button_0",visible:false});
-      addToUIQueue(ship,{id:"team_choose_button_1",visible:false});
-      addToUIQueue(ship,{id:"leave_team",visible:false});
-      addToUIQueue(ship,{id:"team_list_0",visible:false});
-      addToUIQueue(ship,{id:"team_list_1",visible:false});
-      addToUIQueue(ship,startMessage);
-      ship.set({idle:false,collider:true,x:spawns[ship.team][0],y:spawns[ship.team][1],vx:0,vy:0});
+      addToUIQueue(ship, { id: "team_choose_countdown", visible: false });
+      addToUIQueue(ship, { id: "team_choose_button_0", visible: false });
+      addToUIQueue(ship, { id: "team_choose_button_1", visible: false });
+      addToUIQueue(ship, { id: "leave_team", visible: false });
+      addToUIQueue(ship, { id: "team_list_0", visible: false });
+      addToUIQueue(ship, { id: "team_list_1", visible: false });
+      addToUIQueue(ship, startMessage);
+      ship.set({ idle: false, collider: true, x: spawns[ship.custom.team][0], y: spawns[ship.custom.team][1], vx: 0, vy: 0 });
       setTimeout(() => {
-        addToUIQueue(ship,{id:"start_message",visible:false});
-      },4000);
+        addToUIQueue(ship, { id: "start_message", visible: false });
+      }, 4000);
     }
     stepAdjust = game.step;
     modding.terminal.error("GAME: Starting game!");
@@ -433,7 +443,7 @@ var teamChoose = function(game) {
     if (game.step % 60 === 0) {
       teamChooseCountdown.components[1].value = formatTime(teamChooseLength - Math.round((game.step - stepAdjust) / 60));
       for (let ship of game.ships) {
-        addToUIQueue(ship,teamChooseCountdown);
+        addToUIQueue(ship, teamChooseCountdown);
         setShipUI(ship);
       }
     }
@@ -443,35 +453,35 @@ var teamChoose = function(game) {
       }
       for (let ship of game.ships) {
         if (ship.custom.team != "none") {
-          ship.set({idle:true,collider:false,x:(game.ships.indexOf(ship) - (game.ships.length - 1) / 2) * 12,y:0,vx:0,vy:0,angle:90,hue:roundOptions.hues[ship.custom.team]});
+          ship.set({ idle: true, collider: false, x: (game.ships.indexOf(ship) - (game.ships.length - 1) / 2) * 12, y: 0, vx: 0, vy: 0, angle: 90, hue: roundOptions.hues[ship.custom.team] });
         } else {
-          ship.set({idle:true,collider:false,x:(game.ships.indexOf(ship) - (game.ships.length - 1) / 2) * 12,y:0,vx:0,vy:0,angle:90,hue:60});
+          ship.set({ idle: true, collider: false, x: (game.ships.indexOf(ship) - (game.ships.length - 1) / 2) * 12, y: 0, vx: 0, vy: 0, angle: 90, hue: 60 });
         }
-        addToUIQueue(ship,teamChooseButtons[0]);
-        addToUIQueue(ship,teamChooseButtons[1]);
-        addToUIQueue(ship,teamChooseButtons[2]);
+        addToUIQueue(ship, teamChooseButtons[0]);
+        addToUIQueue(ship, teamChooseButtons[1]);
+        addToUIQueue(ship, teamChooseButtons[2]);
         setShipUI(ship);
       }
     }
   }
 };
 
-var mainGame = function(game) {
+var mainGame = function (game) {
   if (game.step % pointTimeUnit === 0) {
     for (let ship of game.ships) {
       if (ship.custom.inPoint) {
         teamScores[ship.team] += pointsPerUnit;
         ship.custom.score += pointsPerUnit;
-        addToUIQueue(ship,objectivePoints);
+        addToUIQueue(ship, objectivePoints);
         setShipUI(ship);
       }
     }
     setTimeout(() => {
       for (let ship of game.ships) {
-        addToUIQueue(ship,{id:"objective_points",visible:false});
+        addToUIQueue(ship, { id: "objective_points", visible: false });
         setShipUI(ship);
       }
-    },pointTimeUnit / 60 * 1000 / 3);
+    }, pointTimeUnit / 60 * 1000 / 3);
   }
   if (game.step % 60 === 0) {
     gameLeft--;
@@ -489,9 +499,9 @@ var mainGame = function(game) {
     }
     for (let ship of game.ships) {
       if (ship.type == 603) {
-        ship.set({hue:roundOptions.hues[ship.team] + 45});
+        ship.set({ hue: roundOptions.hues[ship.team] + 45 });
       } else {
-        ship.set({hue:roundOptions.hues[ship.team]});
+        ship.set({ hue: roundOptions.hues[ship.team] });
       }
     }
   }
@@ -500,38 +510,38 @@ var mainGame = function(game) {
     teamInfo.components[1].value = teamScores[1];
     for (let ship of game.ships) {
       checkSpawn(ship);
-      addToUIQueue(ship,radarBackground);
-      addToUIQueue(ship,teamInfo);
+      addToUIQueue(ship, radarBackground);
+      addToUIQueue(ship, teamInfo);
     }
   }
   if (game.step % 6 === 0) {
     for (let ship of game.ships) {
-      ship.set({score:ship.custom.score});
+      if (ship.custom.shipChoicesShowing) {
+        checkTeamShips(game, ship);
+      }
+      ship.set({ score: ship.custom.score });
       checkPoint(ship);
       setShipUI(ship);
     }
   }
 };
 
-var changePoint = function(game) {
+var changePoint = function (game) {
   modding.terminal.error("GAME: Changing point");
-  game.setObject({ 
-    id: "point", 
+  game.setObject({
+    id: "point",
     type: pointObj,
-    position: {x:pointLocs[pointsSoFar][0],y:pointLocs[pointsSoFar][1],z:-5}, 
-    rotation: {x:(90*Math.PI)/180,y:0,z:0},
-    scale: {x:pointSize[0] * 0.5,y:1,z:pointSize[1] * 0.5}
+    position: { x: pointLocs[pointsSoFar][0], y: pointLocs[pointsSoFar][1], z: -5 },
+    rotation: { x: (90 * Math.PI) / 180, y: 0, z: 0 },
+    scale: { x: pointSize[0] * 0.5, y: 1, z: pointSize[1] * 0.5 }
   });
   removeRadarEl("point");
-  addRadarEl("point",pointLocs[pointsSoFar][0],pointLocs[pointsSoFar][1],pointSize[0],pointSize[1],58,85,65,0.4,"box");
+  addRadarEl("point", pointLocs[pointsSoFar][0], pointLocs[pointsSoFar][1], pointSize[0], pointSize[1], 58, 85, 65, 0.4, "box");
   pointsSoFar += 1;
 };
 
-var gameOver = function(game) {
-  let winnerColor;
-  let loserColor;
-  let bestKillers = ["",0,"",0];
-  let bestObjectives = ["",0,"",0];
+var gameOver = function (game) {
+  let winnerColor, loserColor;
   for (let [key, value] of Object.entries(hueNames)) {
     if (value == roundOptions.hues[teamScores.indexOf(Math.max(teamScores))]) {
       winnerColor = key;
@@ -539,51 +549,50 @@ var gameOver = function(game) {
       loserColor = key;
     }
   }
+  modding.terminal.error(`GAME: ${winnerColor} wins!`);
+  teamInfo.components[3].value = "";
+  teamInfo.components[4].value = "";
+  gameOverUI.components[0].color = `hsl(${hueNames[winnerColor]},100%,70%)`;
+  gameOverUI.components[0].value = winnerColor + " ";
+  gameOverUI.components[3].color = `hsl(${hueNames[loserColor]},100%,70%)`;
+  gameOverUI.components[3].value += loserColor;
   for (let ship of game.ships) {
-    if (ship.custom.score > bestObjectives[ship.team * 2 + 1]) {
-      bestObjectives[ship.team * 2] = ship.name;
-      bestObjectives[ship.team * 2 + 1] = ship.custom.score;
-    }
-    if (ship.custom.kills > bestKillers[ship.team * 2 + 1]) {
-      bestKillers[ship.team * 2] = ship.name;
-      bestKillers[ship.team * 2 + 1] = ship.custom.kills;
-    }
-  }
-  for (let ship of game.ships) {
+    // create end message
     let endMessage = {};
     endMessage[`${winnerColor} team wins!`] = "";
     endMessage["Objective points"] = ship.custom.score;
     endMessage["Kills"] = ship.custom.kills;
     endMessage["Deaths"] = ship.custom.deaths;
-    endMessage[""] = "";
-    endMessage[`Best objective point gatherer on ${winnerColor} team`] = `${bestObjectives[teamScores.indexOf(Math.max(teamScores)) * 2]} with ${bestObjectives[teamScores.indexOf(Math.max(teamScores)) * 2 + 1]} points`;
-    endMessage[`Best objective point gatherer on ${loserColor} team`] = `${bestObjectives[teamScores.indexOf(Math.min(teamScores)) * 2]} with ${bestObjectives[teamScores.indexOf(Math.min(teamScores)) * 2 + 1]} points`;
-    endMessage[`Best killer on ${winnerColor} team`] = `${bestKillers[teamScores.indexOf(Math.max(teamScores)) * 2]} with ${bestKillers[teamScores.indexOf(Math.max(teamScores)) * 2 + 1]} kills`;
-    endMessage[`Best killer on ${loserColor} team`] = `${bestKillers[teamScores.indexOf(Math.min(teamScores)) * 2]} with ${bestKillers[teamScores.indexOf(Math.min(teamScores)) * 2 + 1]} kills`;
-    ship.set({idle:true,collider:false,x:(game.ships.indexOf(ship) - (game.ships.length - 1) / 2) * 12,y:0,vx:0,vy:0,angle:90});
+    // position ship with other ships
+    ship.set({ idle: true, collider: false, x: (game.ships.indexOf(ship) - (game.ships.length - 1) / 2) * 12, y: 0, vx: 0, vy: 0, angle: 90 });
+    // set game over UI
+    addToUIQueue(ship, teamInfo);
+    addToUIQueue(ship, gameOverUI);
+    setShipUI(ship);
+    // send ship to gameover screen
     setTimeout(() => {
       ship.gameover(endMessage);
-    },gameOverLobbyLength * 1000);
+    }, gameOverLobbyLength * 1000);
   }
 };
 
 
-var clearUIQueue = function(ship) {
+var clearUIQueue = function (ship) {
   ship.custom.uiQueue = [];
 };
 
-var addToUIQueue = function(ship,component) {
+var addToUIQueue = function (ship, component) {
   ship["custom"].uiQueue.push(component);
 };
 
-var setShipUI = function(ship) {
+var setShipUI = function (ship) {
   for (let component of ship.custom.uiQueue) {
     ship.setUIComponent(component);
   }
   clearUIQueue(ship);
 };
 
-var shipInit = function(ship) {
+var shipInit = function (ship) {
   modding.terminal.error(`GAME: Ship with name ${ship.name} has been initialized.`);
   ship.custom.init = true;
   ship.custom.shipChooseButton = false;
@@ -597,131 +606,130 @@ var shipInit = function(ship) {
   for (let i = 0; i < roundOptions.ship_array.length - 1; i++) {
     ship.custom.shipChoices["shipChoose_" + i] = JSON.parse(JSON.stringify(shipChooseTemplate));
     ship.custom.shipChoices["shipChoose_" + i].id += i;
-    ship.custom.shipChoices["shipChoose_" + i].position = [(100 - shipChooseTemplate.totalWidth) / 2,(i * (shipChooseTemplate.totalHeight / roundOptions.ship_array.length)) + shipChooseTemplate.topOffset,shipChooseTemplate.totalWidth,shipChooseTemplate.totalHeight / roundOptions.ship_array.length];
+    ship.custom.shipChoices["shipChoose_" + i].position = [(100 - shipChooseTemplate.totalWidth) / 2, (i * (shipChooseTemplate.totalHeight / roundOptions.ship_array.length)) + shipChooseTemplate.topOffset, shipChooseTemplate.totalWidth, shipChooseTemplate.totalHeight / roundOptions.ship_array.length];
     ship.custom.shipChoices["shipChoose_" + i].shortcut = ship.custom.shipChoices["shipChoose_" + i].id.charAt(ship.custom.shipChoices["shipChoose_" + i].id.length - 1);
-    ship.custom.shipChoices["shipChoose_" + i].components[0].fill = `hsla(${i*36},100%,40%,0.7)`;
+    ship.custom.shipChoices["shipChoose_" + i].components[0].fill = `hsla(${i * 36},100%,40%,0.7)`;
     ship.custom.shipChoices["shipChoose_" + i].components[1].value = (Object.keys(shipSets[roundOptions.ship_set])[i]) + "-Class";
     ship.custom.shipChoices["shipChoose_" + i].components[2].value = (JSON.parse(Object.values(shipSets[roundOptions.ship_set])[i]).name);
     ship.custom.shipChoices["shipChoose_" + i].components[3].value = "[" + ship.custom.shipChoices["shipChoose_" + i].shortcut + "]";
   }
-  addToUIQueue(ship,creditsUI);
-  addToUIQueue(ship,radarBackground);
+  addToUIQueue(ship, creditsUI);
+  addToUIQueue(ship, radarBackground);
   setShipUI(ship);
 };
 
-var addRadarEl = function(id,x, y, width, height, hue, sat, light, alpha, type){
+var addRadarEl = function (id, x, y, width, height, hue, sat, light, alpha, type) {
   let el = {
     id: id,
-		type: type,
-		position: [
-			50 + (x * radarSpotScale) - (width * radarSpotScale) / 2, // middle - position adjusted - half of width adjusted
-			50 - (y * radarSpotScale) - (height * radarSpotScale) / 2, // middle - position adjusted - half of width adjusted
-			width * radarSpotScale,
-			height * radarSpotScale
-		],
-		fill:`hsla(${hue},100%,40%,${alpha})`
-	};
-	if (type == "box" || type == "round") {
-	  el.width = 1;
-	  el.stroke = `hsla(${hue},${sat}%,${light}%,${alpha + 0.1})`
-	}
-	radarBackground.components.push(el);
+    type: type,
+    position: [
+      50 + (x * radarSpotScale) - (width * radarSpotScale) / 2, // middle - position adjusted - half of width adjusted
+      50 - (y * radarSpotScale) - (height * radarSpotScale) / 2, // middle - position adjusted - half of width adjusted
+      width * radarSpotScale,
+      height * radarSpotScale
+    ],
+    fill: `hsla(${hue},100%,40%,${alpha})`
+  };
+  if (type == "box" || type == "round") {
+    el.width = 1;
+    el.stroke = `hsla(${hue},${sat}%,${light}%,${alpha + 0.1})`
+  }
+  radarBackground.components.push(el);
 };
 
-var removeRadarEl = function(id) {
+var removeRadarEl = function (id) {
   for (let component of radarBackground.components) {
     if (component.id == id) {
-      radarBackground.components.splice(radarBackground.components.indexOf(component),1);
+      radarBackground.components.splice(radarBackground.components.indexOf(component), 1);
       break;
     }
   }
 };
 
-var spawnValues = function(ship) {
+var spawnValues = function (ship) {
   modding.terminal.error(`GAME: Ship with name ${ship.name} has been respawned.`);
-  ship.set({crystals:720 * crystalsToGive,x:spawns[ship.team][0],y:spawns[ship.team][1],vx:0,vy:0});
+  ship.set({ crystals: 720 * crystalsToGive, x: spawns[ship.team][0], y: spawns[ship.team][1], vx: 0, vy: 0 });
 };
 
-var showShipChoices = function(ship,changeButton = true) {
-  for (let id of Object.keys(ship.custom.shipChoices)) {
-    addToUIQueue(ship,ship.custom.shipChoices[id]);
-  }
+var showShipChoices = function (game, ship, changeButton = true) {
+  checkTeamShips(game, ship);
   ship.custom.shipChoicesShowing = true;
-  addToUIQueue(ship,{id:"ship_choose_button",visible:false});
+  addToUIQueue(ship, { id: "ship_choose_button", visible: false });
   if (changeButton) {
-    addToUIQueue(ship,hideShipChoicesButton);
+    addToUIQueue(ship, hideShipChoicesButton);
   }
 };
 
-var hideShipChoices = function(ship,changeButton = true) {
+var hideShipChoices = function (ship, changeButton = true) {
   for (let id of Object.keys(ship.custom.shipChoices)) {
-    addToUIQueue(ship,{id:id,visible:false});
+    addToUIQueue(ship, { id: id, visible: false });
   }
   ship.custom.shipChoicesShowing = false;
-  addToUIQueue(ship,{id:"ship_choose_button",visible:false});
+  addToUIQueue(ship, { id: "ship_choose_button", visible: false });
   if (changeButton) {
-    addToUIQueue(ship,showShipChoicesButton);
+    addToUIQueue(ship, showShipChoicesButton);
   }
 }
 
-var checkSpawn = function(ship) {
-  if (isInRange((spawns[ship.team][0] - (spawnSize[0] / 2)),(spawns[ship.team][0] + (spawnSize[0] / 2)),ship.x) && isInRange((spawns[ship.team][1] - (spawnSize[1] / 2)),(spawns[ship.team][1] + (spawnSize[1] / 2)),ship.y)) {
+var checkSpawn = function (ship) {
+  if (isInRange((spawns[ship.team][0] - (spawnSize[0] / 2)), (spawns[ship.team][0] + (spawnSize[0] / 2)), ship.x) && isInRange((spawns[ship.team][1] - (spawnSize[1] / 2)), (spawns[ship.team][1] + (spawnSize[1] / 2)), ship.y)) {
     if (!ship.custom.inSpawn) {
-      addToUIQueue(ship,showShipChoicesButton);
+      addToUIQueue(ship, showShipChoicesButton);
       ship.custom.inSpawn = true;
     }
   } else {
-    hideShipChoices(ship,false);
+    hideShipChoices(ship, false);
     ship.custom.inSpawn = false;
   }
   if (ship.custom.inSpawn) {
-    ship.set({invulnerable:300,generator:0});
+    ship.set({ invulnerable: 300, generator: 0 });
   }
 };
 
-var checkPoint = function(ship) {
-  if (isInRange((pointLocs[pointsSoFar - 1][0] - (pointSize[0] / 2)),(pointLocs[pointsSoFar - 1][0] + (pointSize[0] / 2)),ship.x) && isInRange((pointLocs[pointsSoFar - 1][1] - (pointSize[1] / 2)),(pointLocs[pointsSoFar - 1][1] + (pointSize[1] / 2)),ship.y)) {
+var checkPoint = function (ship) {
+  if (isInRange((pointLocs[pointsSoFar - 1][0] - (pointSize[0] / 2)), (pointLocs[pointsSoFar - 1][0] + (pointSize[0] / 2)), ship.x) && isInRange((pointLocs[pointsSoFar - 1][1] - (pointSize[1] / 2)), (pointLocs[pointsSoFar - 1][1] + (pointSize[1] / 2)), ship.y)) {
     ship.custom.inPoint = true;
   } else {
     ship.custom.inPoint = false;
   }
 };
 
-var teamFullMsg = function(ship) {
-  addToUIQueue(ship,teamFull);
+var teamFullMsg = function (ship) {
+  addToUIQueue(ship, teamFull);
   setTimeout(() => {
-    addToUIQueue(ship,{id:"team_full",visible:false});
-  },1500);
+    addToUIQueue(ship, { id: "team_full", visible: false });
+  }, 1500);
 };
 
-var setTeams = function(game) {
+var setTeams = function (game) {
   for (let ship of game.ships) {
-    if (ship.custom.team != "none") {
-      ship.set({team:ship.custom.team});
-    } else {
+    if (ship.custom.team == "none") {
       if (teamCounts[0] < teamCounts[1]) {
-        ship.set({team:0});
+        ship.custom.team = 0;
+        teamCounts[0]++;
       } else {
-        ship.set({team:1});
+        ship.custom.team = 1;
+        teamCounts[1]++;
       }
     }
+    ship.set({ team: ship.custom.team });
   }
 };
 
-var updateTeamLists = function(game) {
+var updateTeamLists = function (game) {
   updatingList = true;
   teamLists[0].components = [
-    {type:"box",position:[0,0,100,100],width:2,stroke:"#c0d0e0dd"},
-    {type:"text",position:[5,5,90,10],value:"",color:"#fff",align:"center"},
+    { type: "box", position: [0, 0, 100, 100], width: 2, stroke: "#c0d0e0dd" },
+    { type: "text", position: [5, 5, 90, 10], value: "", color: "#fff", align: "center" },
   ];
   teamLists[1].components = [
-    {type:"box",position:[0,0,100,100],width:2,stroke:"#c0d0e0dd"},
-    {type:"text",position:[5,5,90,10],value:"",color:"#fff",align:"center"},
+    { type: "box", position: [0, 0, 100, 100], width: 2, stroke: "#c0d0e0dd" },
+    { type: "text", position: [5, 5, 90, 10], value: "", color: "#fff", align: "center" },
   ];
   for (let ship of game.ships) {
     let c = {
       type: "player",
-      position: [10,25 + ((teamLists[ship.custom.team]?.components.length - 2) * 12),80,7],
+      position: [10, 25 + ((teamLists[ship.custom.team]?.components.length - 2) * 12), 80, 7],
       id: ship.id,
       align: "left"
     };
@@ -737,10 +745,32 @@ var updateTeamLists = function(game) {
     }
   }
   for (let ship of game.ships) {
-    addToUIQueue(ship,teamLists[0]);
-    addToUIQueue(ship,teamLists[1]);
+    addToUIQueue(ship, teamLists[0]);
+    addToUIQueue(ship, teamLists[1]);
   }
   updatingList = false;
+};
+
+var checkTeamShips = function (game, eventShip) {
+  let takenIndexes = [];
+  for (let ship of game.ships) {
+    if (ship.custom.team == eventShip.custom.team && ship != eventShip) {
+      takenIndexes.push(ship.type - 601);
+    }
+  }
+  let shipChoices = eventShip.custom.shipChoices;
+  for (let id of Object.keys(shipChoices)) {
+    if (takenIndexes.includes(parseInt(id.slice(-1)))) {
+      shipChoices[id].clickable = false;
+      shipChoices[id].components[0].fill = `hsla(${id.slice(-1) * 36},80%,20%,0.7)`;
+    } else {
+      shipChoices[id].clickable = true;
+      shipChoices[id].components[0].fill = `hsla(${id.slice(-1) * 36},100%,40%,0.7)`;
+    }
+  }
+  for (let id of Object.keys(shipChoices)) {
+    addToUIQueue(eventShip, shipChoices[id]);
+  }
 };
 
 // Per-game variables
@@ -754,7 +784,7 @@ var roundOptions = {
 roundOptions.ship_array = Object.values(shipSets[roundOptions.ship_set]);
 roundOptions.ship_array.push(Fly_101);
 
-let credits = roundOptions.ship_set.toString().replaceAll("___","-").replaceAll("__"," ").split("_");
+let credits = roundOptions.ship_set.toString().replaceAll("___", "-").replaceAll("__", " ").split("_");
 
 creditsUI.components[0].value += credits[1];
 creditsUI.components[1].value += credits[0];
@@ -765,7 +795,7 @@ teamInfo.components[1].color = `hsla(${roundOptions.hues[1]},80%,70%,1)`;
 // add spots on radar
 
 for (let i = 0; i < spawns.length; i++) {
-  addRadarEl("spawn_" + i,spawns[i][0],spawns[i][1],spawnSize[0],spawnSize[1],roundOptions.hues[i],100,40,0.25,"box");
+  addRadarEl("spawn_" + i, spawns[i][0], spawns[i][1], spawnSize[0], spawnSize[1], roundOptions.hues[i], 100, 40, 0.25, "box");
 }
 
 this.options = {
@@ -786,7 +816,7 @@ this.options = {
   speed_mod: 1.25
 };
 
-this.event = function(event,game) {
+this.event = function (event, game) {
   let ship = event.ship;
   if (ship) {
     switch (event.name) {
@@ -800,18 +830,18 @@ this.event = function(event,game) {
         let killer = event.killer;
         killer.custom.kills++;
         ship.custom.deaths++;
-        ship.set({x:spawns[ship.team][0],y:spawns[ship.team][1],vx:0,vy:0});
+        ship.set({ x: spawns[ship.team][0], y: spawns[ship.team][1], vx: 0, vy: 0 });
         break;
       case "ui_component_clicked":
         let component = event.id;
-        if (component.substr(0,11) == "shipChoose_") {
+        if (component.substr(0, 11) == "shipChoose_") {
           let code = 601 + parseInt(component.charAt(component.length - 1));
           if (code == 603) {
-            ship.set({type:code,stats:77777777,healing:true});
-          } else{
-            ship.set({type:code,stats:77777777,healing:false});
+            ship.set({ type: code, stats: 77777777, healing: true });
+          } else {
+            ship.set({ type: code, stats: 77777777, healing: false });
           }
-        } else if (component.substr(0,19) == "team_choose_button_") {
+        } else if (component.substr(0, 19) == "team_choose_button_") {
           let team = parseInt(component.charAt(component.length - 1));
           if (teamCounts[team] < Math.ceil(playerCount / 2)) {
             if (ship.custom.team != "none") {
@@ -826,9 +856,9 @@ this.event = function(event,game) {
           switch (component) {
             case "ship_choose_button":
               if (ship.custom.shipChoicesShowing) {
-                hideShipChoices(ship,true);
+                hideShipChoices(ship, true);
               } else {
-                showShipChoices(ship,true);
+                showShipChoices(game, ship, true);
               }
               break;
             case "leave_team":
@@ -842,6 +872,7 @@ this.event = function(event,game) {
   }
 };
 
+playerCount = Math.floor(playerCount) % 2 === 0 ? Math.floor(playerCount) : Math.floor(playerCount) + 1;
 this.tick = waiting;
 game.removeObject();
 modding.terminal.error(`GAME: Ship set is ${roundOptions.ship_set}`);
