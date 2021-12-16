@@ -899,9 +899,9 @@ this.event = function (event, game) {
           } else {
             shipInit(ship);
             if (this.tick == mainGame) {
-              ship.custom.team = teamCounts[0] < teamCounts[1]
-                ? (ship.custom.team = 0), (teamCounts[0]++)
-                : (ship.custom.team = 1), (teamCounts[1]++);
+              teamCounts[0] < teamCounts[1]
+                ? ((ship.custom.team = 0), (teamCounts[0]++))
+                : ((ship.custom.team = 1), (teamCounts[1]++));
               ship.set({ team: ship.custom.team });
             }
           }
