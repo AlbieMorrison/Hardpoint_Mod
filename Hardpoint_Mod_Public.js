@@ -140,15 +140,15 @@ var weaponGenObj = {
 };
 
 var soundtracks = ["procedurality.mp3", "warp_drive.mp3", "crystals.mp3", "red_mist.mp3", "civilisation.mp3", "argon.mp3"];
-var playerCount = 4; // number of players to wait for before game start, this will be rounded up to the nearest even number.
+var playerCount = 8; // number of players to wait for before game start, this will be rounded up to the nearest even number.
 var crystalsToGive = 0.5; // multiplier on max crystals to give to ship when it respawns
 var mapSize = 120;
 var gameLength = 720; // in seconds
 var gameLeft = JSON.parse(JSON.stringify(gameLength));
 var pointsPerUnit = 10;
 var pointTimeUnit = 60; // in ticks
-var teamChooseLength = 60; // in seconds
-var gameOverLobbyLength = 40; // in seconds
+var teamChooseLength = 45; // in seconds
+var gameOverLobbyLength = 15; // in seconds
 
 var hues = [[0, 180], [20, 240], [180, 300], [120, 280], [140, 300]];
 var hueNames = {
@@ -551,6 +551,9 @@ var mainGame = function (game) {
     }
     if (shipCount > game.ships.length) {
       for (let ship of game.ships) {
+        if (!ship.custom.init) {
+          shipInit(ship);
+        }
         if (ship.custom.team == "none") {
           ship.custom.team = teamCounts[0] < teamCounts[1] ? 0 : 1;
           ship.set({ team: ship.custom.team });
@@ -641,7 +644,7 @@ var startWeaponGen = function (game) {
     rotation: { x: 0, y: 0, z: 0 },
     scale: { x: 12, y: 12, z: 12 }
   });
-  addRadarEl("weapon_gen", 0, 0, 50, 50, 0, 100, 65, 0.2, "round");
+  addRadarEl("weapon_gen", 0, 0, 50, 50, 0, 100, 60, 0.25, "round");
   weaponGenInterval = setInterval(() => {
     if (game.collectibles.length <= 5) {
       let random = Math.random();
@@ -715,11 +718,11 @@ var shipInit = function (ship) {
     ship.custom.shipChoices["shipChoose_" + i] = JSON.parse(JSON.stringify(shipChooseTemplate));
     ship.custom.shipChoices["shipChoose_" + i].id += i;
     ship.custom.shipChoices["shipChoose_" + i].position = [(100 - shipChooseTemplate.totalWidth) / 2, (i * (shipChooseTemplate.totalHeight / roundOptions.ship_array.length)) + shipChooseTemplate.topOffset, shipChooseTemplate.totalWidth, shipChooseTemplate.totalHeight / roundOptions.ship_array.length];
-    ship.custom.shipChoices["shipChoose_" + i].shortcut = ship.custom.shipChoices["shipChoose_" + i].id.charAt(ship.custom.shipChoices["shipChoose_" + i].id.length - 1);
+    ship.custom.shipChoices["shipChoose_" + i].shortcut = i.toString();
     ship.custom.shipChoices["shipChoose_" + i].components[0].fill = `hsla(${i * 36},100%,40%,0.7)`;
     ship.custom.shipChoices["shipChoose_" + i].components[1].value = (Object.keys(shipSets[roundOptions.ship_set])[i]) + "-Class";
     ship.custom.shipChoices["shipChoose_" + i].components[2].value = (JSON.parse(Object.values(shipSets[roundOptions.ship_set])[i]).name);
-    ship.custom.shipChoices["shipChoose_" + i].components[3].value = "[" + ship.custom.shipChoices["shipChoose_" + i].shortcut + "]";
+    ship.custom.shipChoices["shipChoose_" + i].components[3].value = "[" + i + "]";
   }
   addToUIQueue(ship, creditsUI);
   addToUIQueue(ship, radarBackground);
