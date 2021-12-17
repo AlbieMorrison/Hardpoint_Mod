@@ -128,21 +128,21 @@ var pointObj = {
   id: "point_obj",
   obj: "https://raw.githubusercontent.com/AlbieMorrison/Hardpoint_Mod/main/point.obj",
   diffuse: "https://raw.githubusercontent.com/AlbieMorrison/Hardpoint_Mod/main/emissive_2.jpg",
-  diffuseColor: 0xEEEA5D
+  diffuseColor: 0xeeea5d
 };
 
 var weaponGenObj = {
   id: "weapon_gen_obj",
   obj: "https://raw.githubusercontent.com/AlbieMorrison/Hardpoint_Mod/main/weapon_generator.obj",
-  diffuse: "https://raw.githubusercontent.com/AlbieMorrison/Hardpoint_Mod/main/ship_lambert_texture_yellow.png",
+  diffuse: "https://raw.githubusercontent.com/AlbieMorrison/Hardpoint_Mod/main/ship_lambert_texture.png",
   emissive: "https://raw.githubusercontent.com/AlbieMorrison/Hardpoint_Mod/main/ship_emissive_texture.png",
-  emissiveColor: 0xEEEA5D
+  emissiveColor: 0xff2222
 };
 
 var soundtracks = ["procedurality.mp3", "warp_drive.mp3", "crystals.mp3", "red_mist.mp3", "civilisation.mp3", "argon.mp3"];
 var playerCount = 4; // number of players to wait for before game start, this will be rounded up to the nearest even number.
 var crystalsToGive = 0.5; // multiplier on max crystals to give to ship when it respawns
-var mapSize = 90;
+var mapSize = 120;
 var gameLength = 720; // in seconds
 var gameLeft = JSON.parse(JSON.stringify(gameLength));
 var pointsPerUnit = 10;
@@ -165,17 +165,19 @@ var teamScores = [0, 0];
 var teamCounts = [0, 0];
 var playerUICounts = [0, 0];
 
-var spawns = [[-mapSize * 3, 0], [mapSize * 3, 0]];
+var spawns = [[-mapSize * 3.5, 0], [mapSize * 3.5, 0]];
 var spawnSize = [60, 60];
 
-var pointLocs = [[-mapSize, mapSize * 1.5], [mapSize, -mapSize * 1.5], [-mapSize, -mapSize * 1.5], [mapSize, mapSize * 1.5]];
+var pointLocs = [[-mapSize * 1.25, mapSize * 1.5], [mapSize * 1.25, -mapSize * 1.5], [-mapSize * 1.25, -mapSize * 1.5], [mapSize * 1.25, mapSize * 1.5]];
 var pointSize = [80, 80];
 var pointsSoFar = 0;
+var shipCount = 0;
 
 var stepAdjust, timeToPointChange, weaponGenInterval;
 
 var updatingList = false;
 var draw = false;
+var currentType = Math.random() < 0.5 ? 1 : 2;
 
 var radarSpotScale = 100 / (mapSize * 10); // percent divided by the map size in world coords
 var playerYScale = Math.min(32 / (playerCount / 2), 6);
@@ -437,24 +439,15 @@ var waiting = function (game) {
 var teamChoose = function (game) {
   if (game.step - stepAdjust >= teamChooseLength * 60) {
     setTeams(game);
-    let currentType = Math.random() < 0.5 ? 1 : 2;
+    hideTeamChooseUI(game);
     for (let ship of game.ships) {
-      addToUIQueue(ship, { id: "team_choose_countdown", visible: false });
-      addToUIQueue(ship, { id: "team_choose_button_0", visible: false });
-      addToUIQueue(ship, { id: "team_choose_button_1", visible: false });
-      addToUIQueue(ship, { id: "leave_team", visible: false });
-      addToUIQueue(ship, { id: "team_list_0", visible: false });
-      addToUIQueue(ship, { id: "team_list_1", visible: false });
       addToUIQueue(ship, startMessage);
-      for (let { id } of game.ships) {
-        addToUIQueue(ship, {id: "player_list_" + id, visible: false});
-      }
       ship.set({ idle: false, collider: true, x: spawns[ship.custom.team][0], y: spawns[ship.custom.team][1], vx: 0, vy: 0, type: 600 + currentType });
       setTimeout(() => {
         addToUIQueue(ship, { id: "start_message", visible: false });
       }, 4000);
       currentType++;
-      currentType > 10 && (currentType = 1);
+      currentType > Object.keys(shipSets[roundOptions.ship_set]).length && (currentType = 1);
     }
     stepAdjust = game.step;
     modding.terminal.error("GAME: Starting game!");
@@ -486,6 +479,11 @@ var teamChoose = function (game) {
       if (!updatingList) {
         updateTeamLists(game);
       }
+      if (shipCount < game.ships.length || game.ships.length < playerCount) {
+        hideTeamChooseUI(game);
+        this.tick = waiting;
+      }
+      shipCount = game.ships.length;
     }
   }
 };
@@ -523,9 +521,9 @@ var mainGame = function (game) {
     }
     for (let ship of game.ships) {
       if (ship.type == 603) {
-        ship.set({ hue: roundOptions.hues[ship.team] + 45 });
+        ship.set({ hue: roundOptions.hues[ship.team] + 45, healing: true });
       } else {
-        ship.set({ hue: roundOptions.hues[ship.team] });
+        ship.set({ hue: roundOptions.hues[ship.team], healing: false });
       }
     }
   }
@@ -547,11 +545,25 @@ var mainGame = function (game) {
       checkPoint(ship);
       setShipUI(ship);
     }
+    teamCounts = [0, 0];
+    for (let s of game.ships) {
+      typeof s.custom.team == "number" && (teamCounts[s.custom.team]++);
+    }
+    if (shipCount > game.ships.length) {
+      for (let ship of game.ships) {
+        if (ship.custom.team == "none") {
+          ship.custom.team = teamCounts[0] < teamCounts[1] ? 0 : 1;
+          ship.set({ team: ship.custom.team });
+          spawnValues(ship);
+        }
+      }
+    }
+    shipCount = game.ships.length;
   }
 };
 
 var changePoint = function (game) {
-  modding.terminal.error("GAME: Changing point");
+  modding.terminal.error("GAME: Changing point.");
   game.setObject({
     id: "point",
     type: pointObj,
@@ -577,7 +589,7 @@ var gameOver = function (game) {
   if (Math.max(...teamScores) == Math.min(...teamScores)) {
     draw = true;
   }
-  modding.terminal.error("GAME: Game is over");
+  modding.terminal.error("GAME: Game is over.");
   draw
     ? modding.terminal.error("GAME: The game ended in a draw.")
     : modding.terminal.error(`GAME: Team ${winnerColor} wins!`);
@@ -629,7 +641,7 @@ var startWeaponGen = function (game) {
     rotation: { x: 0, y: 0, z: 0 },
     scale: { x: 12, y: 12, z: 12 }
   });
-  addRadarEl("weapon_gen", 0, 0, 50, 50, 60, 85, 70, 0.1, "round");
+  addRadarEl("weapon_gen", 0, 0, 50, 50, 0, 100, 65, 0.2, "round");
   weaponGenInterval = setInterval(() => {
     if (game.collectibles.length <= 5) {
       let random = Math.random();
@@ -668,6 +680,24 @@ var setShipUI = function (ship) {
     ship.setUIComponent(component);
   }
   clearUIQueue(ship);
+};
+
+var hideTeamChooseUI = function (game) {
+  let maxId = 1;
+  for (let ship of game.ships) {
+    addToUIQueue(ship, { id: "team_choose_countdown", visible: false });
+    addToUIQueue(ship, { id: "team_choose_button_0", visible: false });
+    addToUIQueue(ship, { id: "team_choose_button_1", visible: false });
+    addToUIQueue(ship, { id: "leave_team", visible: false });
+    addToUIQueue(ship, { id: "team_list_0", visible: false });
+    addToUIQueue(ship, { id: "team_list_1", visible: false });
+    ship.id > maxId && (maxId = ship.id);
+  }
+  for (let i = 1; i <= maxId; i++) {
+    for (let ship of game.ships) {
+      addToUIQueue(ship, {id: "player_list_" + i, visible: false});
+    }
+  }
 };
 
 var shipInit = function (ship) {
@@ -726,7 +756,9 @@ var removeRadarEl = function (id) {
 
 var spawnValues = function (ship) {
   modding.terminal.error(`GAME: Ship with name ${ship.name} has been respawned.`);
-  ship.set({ crystals: 720 * crystalsToGive, x: spawns[ship.team][0], y: spawns[ship.team][1], vx: 0, vy: 0 });
+  ship.set({ crystals: 720 * crystalsToGive, x: spawns[ship.team][0], y: spawns[ship.team][1], vx: 0, vy: 0, type: 600 + currentType, stats: 77777777 });
+  currentType++;
+  currentType > Object.keys(shipSets[roundOptions.ship_set]).length && (currentType = 1);
 };
 
 var showShipChoices = function (game, ship, changeButton = true) {
@@ -898,12 +930,6 @@ this.event = function (event, game) {
             ship.gameover({ "Game is full": "" });
           } else {
             shipInit(ship);
-            if (this.tick == mainGame) {
-              teamCounts[0] < teamCounts[1]
-                ? ((ship.custom.team = 0), (teamCounts[0]++))
-                : ((ship.custom.team = 1), (teamCounts[1]++));
-              ship.set({ team: ship.custom.team });
-            }
           }
         }
         spawnValues(ship);
