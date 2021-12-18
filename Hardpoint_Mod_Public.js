@@ -140,14 +140,14 @@ var weaponGenObj = {
 };
 
 var soundtracks = ["procedurality.mp3", "warp_drive.mp3", "crystals.mp3", "red_mist.mp3", "civilisation.mp3", "argon.mp3"];
-var playerCount = 6; // number of players to wait for before game start, this will be rounded up to the nearest even number.
+var playerCount = 2; // number of players to wait for before game start, this will be rounded up to the nearest even number.
 var crystalsToGive = 0.5; // multiplier on max crystals to give to ship when it respawns
 var mapSize = 120;
 var gameLength = 720; // in seconds
 var gameLeft = JSON.parse(JSON.stringify(gameLength));
 var pointsPerUnit = 10;
 var pointTimeUnit = 60; // in ticks
-var teamChooseLength = 45; // in seconds
+var teamChooseLength = 5; // in seconds
 var gameOverLobbyLength = 15; // in seconds
 
 var hues = [[0, 180], [20, 240], [180, 300], [120, 280], [140, 300]];
@@ -297,11 +297,11 @@ var startMessage = {
   visible: true,
   components: [
     { type: "text", position: [40, 30, 20, 10], value: "GO!", color: "#fff", align: "center" },
-    { type: "text", position: [10, 59, 80, 5], value: "Storm the point with your teammates and hold it for as long as possible against the other team!", color: "#bbb", align: "center" },
-    { type: "text", position: [10, 66, 80, 4], value: "The longer you are on the point and the more ships you have on it, the faster your team will gain score.", color: "#bbb", align: "center" },
-    { type: "text", position: [10, 74, 80, 4], value: "If the other team holds the point for too long and you can't seem to push them off of it,", color: "#bbb", align: "center" },
-    { type: "text", position: [10, 80, 80, 4], value: "head to the center of the map, where there is a secondary weapon generator", color: "#bbb", align: "center" },
-    { type: "text", position: [10, 86, 80, 4], value: "that will help increase your firepower.", color: "#bbb", align: "center" }
+    { type: "text", position: [10, 64, 80, 4], value: "Storm the point with your teammates and hold it for as long as possible against the other team!", color: "#ddd", align: "center" },
+    { type: "text", position: [10, 70, 80, 4], value: "The longer you are on the point and the more ships you have on it, the faster your team will gain score.", color: "#ddd", align: "center" },
+    { type: "text", position: [10, 76, 80, 4], value: "If the other team holds the point for too long and you can't seem to push them off of it,", color: "#ddd", align: "center" },
+    { type: "text", position: [10, 81, 80, 4], value: "head to the center of the map, where there is a secondary weapon generator", color: "#ddd", align: "center" },
+    { type: "text", position: [10, 86, 80, 4], value: "that will help increase your firepower.", color: "#ddd", align: "center" }
   ]
 };
 
