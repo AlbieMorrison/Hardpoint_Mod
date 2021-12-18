@@ -522,8 +522,10 @@ var mainGame = function (game) {
     }
     if (shipCount < game.ships.length) {
       for (let ship of game.ships) {
-        if (!ship.custom.init || ship.custom.team == "none") {
+        if (!ship.custom.init) {
           shipInit(ship);
+        }
+        if (ship.custom.team == "none") {
           ship.custom.team = teamCounts[0] < teamCounts[1] ? 0 : 1;
           ship.set({ team: ship.custom.team });
           spawnValues(ship);
@@ -931,6 +933,8 @@ this.event = function (event, game) {
         if (!ship.custom.init) {
           if (game.ships.length > playerCount) {
             ship.gameover({ "Game is full": "" });
+          } else {
+            shipInit(ship);
           }
         } else {
           spawnValues(ship);
