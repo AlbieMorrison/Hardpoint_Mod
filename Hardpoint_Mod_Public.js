@@ -293,7 +293,7 @@ var teamFull = {
 
 var startMessage = {
   id: "start_message",
-  position: [0, 0, 10, 100],
+  position: [0, 0, 100, 100],
   visible: true,
   components: [
     { type: "text", position: [40, 30, 20, 10], value: "GO!", color: "#fff", align: "center" },
