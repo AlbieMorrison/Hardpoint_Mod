@@ -442,12 +442,10 @@ var teamChoose = function (game) {
     hideTeamChooseUI(game);
     for (let ship of game.ships) {
       addToUIQueue(ship, startMessage);
-      ship.set({ idle: false, collider: true, x: spawns[ship.custom.team][0], y: spawns[ship.custom.team][1], vx: 0, vy: 0, type: 600 + currentType });
       setTimeout(() => {
         addToUIQueue(ship, { id: "start_message", visible: false });
       }, 4000);
-      currentType++;
-      currentType > Object.keys(shipSets[roundOptions.ship_set]).length && (currentType = 1);
+      spawnValues(ship);
     }
     stepAdjust = game.step;
     modding.terminal.error("GAME: Starting game!");
@@ -479,6 +477,10 @@ var teamChoose = function (game) {
       if (!updatingList) {
         updateTeamLists(game);
       }
+      teamCounts = [0, 0];
+      for (let s of game.ships) {
+        typeof s.custom.team == "number" && (teamCounts[s.custom.team]++);
+      }
       if (shipCount < game.ships.length || game.ships.length < playerCount) {
         hideTeamChooseUI(game);
         this.tick = waiting;
@@ -504,6 +506,31 @@ var mainGame = function (game) {
         setShipUI(ship);
       }
     }, pointTimeUnit / 60 * 1000 / 2);
+  }
+  if (game.step % 6 === 0) {
+    for (let ship of game.ships) {
+      if (ship.custom.shipChoicesShowing) {
+        checkTeamShips(game, ship);
+      }
+      ship.set({ score: ship.custom.score });
+      checkPoint(ship);
+      setShipUI(ship);
+    }
+    teamCounts = [0, 0];
+    for (let s of game.ships) {
+      typeof s.custom.team == "number" && (teamCounts[s.custom.team]++);
+    }
+    if (shipCount < game.ships.length) {
+      for (let ship of game.ships) {
+        if (!ship.custom.init || ship.custom.team == "none") {
+          shipInit(ship);
+          ship.custom.team = teamCounts[0] < teamCounts[1] ? 0 : 1;
+          ship.set({ team: ship.custom.team });
+          spawnValues(ship);
+        }
+      }
+    }
+    shipCount = game.ships.length;
   }
   if (game.step % 60 === 0) {
     gameLeft--;
@@ -535,33 +562,6 @@ var mainGame = function (game) {
       addToUIQueue(ship, radarBackground);
       addToUIQueue(ship, teamInfo);
     }
-  }
-  if (game.step % 6 === 0) {
-    for (let ship of game.ships) {
-      if (ship.custom.shipChoicesShowing) {
-        checkTeamShips(game, ship);
-      }
-      ship.set({ score: ship.custom.score });
-      checkPoint(ship);
-      setShipUI(ship);
-    }
-    teamCounts = [0, 0];
-    for (let s of game.ships) {
-      typeof s.custom.team == "number" && (teamCounts[s.custom.team]++);
-    }
-    if (shipCount > game.ships.length) {
-      for (let ship of game.ships) {
-        if (!ship.custom.init) {
-          shipInit(ship);
-        }
-        if (ship.custom.team == "none") {
-          ship.custom.team = teamCounts[0] < teamCounts[1] ? 0 : 1;
-          ship.set({ team: ship.custom.team });
-          spawnValues(ship);
-        }
-      }
-    }
-    shipCount = game.ships.length;
   }
 };
 
@@ -675,7 +675,7 @@ var clearUIQueue = function (ship) {
 };
 
 var addToUIQueue = function (ship, component) {
-  ship["custom"].uiQueue.push(component);
+  ship.custom.uiQueue.push(component);
 };
 
 var setShipUI = function (ship) {
@@ -759,7 +759,7 @@ var removeRadarEl = function (id) {
 
 var spawnValues = function (ship) {
   modding.terminal.error(`GAME: Ship with name ${ship.name} has been respawned.`);
-  ship.set({ crystals: 720 * crystalsToGive, x: spawns[ship.team][0], y: spawns[ship.team][1], vx: 0, vy: 0, type: 600 + currentType, stats: 77777777 });
+  ship.set({ idle: false, collider: true, crystals: 720 * crystalsToGive, x: spawns[ship.custom.team][0], y: spawns[ship.custom.team][1], vx: 0, vy: 0, type: 600 + currentType, stats: 77777777 });
   currentType++;
   currentType > Object.keys(shipSets[roundOptions.ship_set]).length && (currentType = 1);
 };
@@ -931,11 +931,10 @@ this.event = function (event, game) {
         if (!ship.custom.init) {
           if (game.ships.length > playerCount) {
             ship.gameover({ "Game is full": "" });
-          } else {
-            shipInit(ship);
           }
+        } else {
+          spawnValues(ship);
         }
-        spawnValues(ship);
         break;
       case "ship_destroyed":
         let killer = event.killer;
