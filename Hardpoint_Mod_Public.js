@@ -293,10 +293,15 @@ var teamFull = {
 
 var startMessage = {
   id: "start_message",
-  position: [40, 30, 20, 10],
+  position: [0, 0, 10, 100],
   visible: true,
   components: [
-    { type: "text", position: [0, 0, 100, 100], value: "GO!", color: "#fff", align: "center" },
+    { type: "text", position: [40, 30, 20, 10], value: "GO!", color: "#fff", align: "center" },
+    { type: "text", position: [10, 59, 80, 5], value: "Storm the point with your teammates and hold it for as long as possible against the other team!", color: "#bbb", align: "center" },
+    { type: "text", position: [10, 66, 80, 4], value: "The longer you are on the point and the more ships you have on it, the faster your team will gain score.", color: "#bbb", align: "center" },
+    { type: "text", position: [10, 74, 80, 4], value: "If the other team holds the point for too long and you can't seem to push them off of it,", color: "#bbb", align: "center" },
+    { type: "text", position: [10, 80, 80, 4], value: "head to the center of the map, where there is a secondary weapon generator", color: "#bbb", align: "center" },
+    { type: "text", position: [10, 86, 80, 4], value: "that will help increase your firepower.", color: "#bbb", align: "center" }
   ]
 };
 
@@ -444,7 +449,7 @@ var teamChoose = function (game) {
       addToUIQueue(ship, startMessage);
       setTimeout(() => {
         addToUIQueue(ship, { id: "start_message", visible: false });
-      }, 4000);
+      }, 7000);
       spawnValues(ship);
     }
     stepAdjust = game.step;
