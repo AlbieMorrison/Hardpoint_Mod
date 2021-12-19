@@ -140,15 +140,15 @@ var weaponGenObj = {
 };
 
 var soundtracks = ["procedurality.mp3", "warp_drive.mp3", "crystals.mp3", "red_mist.mp3", "civilisation.mp3", "argon.mp3"];
-var playerCount = 2; // number of players to wait for before game start, this will be rounded up to the nearest even number.
+var playerCount = 8; // number of players to wait for before game start, this will be rounded up to the nearest even number.
 var crystalsToGive = 0.5; // multiplier on max crystals to give to ship when it respawns
 var mapSize = 120;
 var gameLength = 720; // in seconds
 var gameLeft = JSON.parse(JSON.stringify(gameLength));
 var pointsPerUnit = 10;
 var pointTimeUnit = 60; // in ticks
-var teamChooseLength = 5; // in seconds
-var gameOverLobbyLength = 15; // in seconds
+var teamChooseLength = 45; // in seconds
+var gameOverLobbyLength = 20; // in seconds
 
 var hues = [[0, 180], [20, 240], [180, 300], [120, 280], [140, 300]];
 var hueNames = {
