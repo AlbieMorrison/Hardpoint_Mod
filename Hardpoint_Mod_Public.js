@@ -127,8 +127,7 @@ const vocabulary = [
 var pointObj = {
   id: "point_obj",
   obj: "https://raw.githubusercontent.com/AlbieMorrison/Hardpoint_Mod/main/point.obj",
-  diffuse: "https://raw.githubusercontent.com/AlbieMorrison/Hardpoint_Mod/main/emissive_2.jpg",
-  diffuseColor: 0xeeea5d
+  diffuse: "https://raw.githubusercontent.com/AlbieMorrison/Hardpoint_Mod/main/emissive_2.jpg"
 };
 
 var weaponGenObj = {
@@ -140,7 +139,8 @@ var weaponGenObj = {
 };
 
 var soundtracks = ["procedurality.mp3", "warp_drive.mp3", "crystals.mp3", "red_mist.mp3", "civilisation.mp3", "argon.mp3"];
-var playerCount = 8; // number of players to wait for before game start, this will be rounded up to the nearest even number.
+var playerCount = 4; // number of players to wait for before game start, this will be rounded up to the nearest even number.
+var maxPlayers = 20;
 var crystalsToGive = 0.5; // multiplier on max crystals to give to ship when it respawns
 var mapSize = 120;
 var gameLength = 720; // in seconds
@@ -168,20 +168,17 @@ var playerUICounts = [0, 0];
 var spawns = [[-mapSize * 3.5, 0], [mapSize * 3.5, 0]];
 var spawnSize = [60, 60];
 
-var pointLocs = [[-mapSize * 1.25, mapSize * 1.5], [mapSize * 1.25, -mapSize * 1.5], [-mapSize * 1.25, -mapSize * 1.5], [mapSize * 1.25, mapSize * 1.5]];
-var pointSize = [80, 80];
+var pointLocs = [[-mapSize * 1.25, mapSize * 1.5], [mapSize * 1.25, -mapSize * 1.5], [-mapSize * 1.25, -mapSize * 1.5], [mapSize * 1.25, mapSize * 1.5], [0, -mapSize * 2], [0, mapSize * 2]];
+var pointSize = [100, 100];
 var pointsSoFar = 0;
 var shipCount = 0;
 
 var stepAdjust, timeToPointChange, weaponGenInterval;
 
-var updatingList = false;
 var draw = false;
-var currentType = Math.random() < 0.5 ? 1 : 2;
+var currentTypes = [Math.random() < 0.5 ? 1 : 2, Math.random() < 0.5 ? 1 : 2];
 
 var radarSpotScale = 100 / (mapSize * 10); // percent divided by the map size in world coords
-var playerYScale = Math.min(32 / (playerCount / 2), 6);
-
 
 // UI Elements
 
@@ -212,93 +209,15 @@ var waitingMessage = {
   ]
 };
 
-var teamChooseCountdown = {
-  id: "team_choose_countdown",
-  position: [40, 10, 20, 10],
-  visible: true,
-  components: [
-    { type: "text", position: [0, 0, 100, 35], value: "Time left to choose your team:", color: "#fff", align: "center" },
-    { type: "text", position: [0, 40, 100, 60], value: "", color: "#fff", align: "center" }
-  ]
-};
-
-var teamChooseButtons = [
-  {
-    id: "team_choose_button_0",
-    position: [32, 75, 11, 5],
-    visible: true,
-    clickable: true,
-    shortcut: "0",
-    components: [
-      { type: "box", position: [0, 0, 100, 100], width: 2, stroke: "#c0d0e0dd" },
-      { type: "text", position: [5, 5, 20, 90], value: "[0]", color: "#fff", align: "center" },
-      { type: "text", position: [30, 10, 65, 80], value: "Join team", color: "#fff", align: "center" }
-    ]
-  },
-  {
-    id: "team_choose_button_1",
-    position: [57, 75, 11, 5],
-    visible: true,
-    clickable: true,
-    shortcut: "1",
-    components: [
-      { type: "box", position: [0, 0, 100, 100], width: 2, stroke: "#c0d0e0dd" },
-      { type: "text", position: [5, 5, 20, 90], value: "[1]", color: "#fff", align: "center" },
-      { type: "text", position: [30, 10, 65, 80], value: "Join team", color: "#fff", align: "center" }
-    ]
-  },
-  {
-    id: "leave_team",
-    position: [45, 75, 10, 5],
-    visible: true,
-    clickable: true,
-    shortcut: "L",
-    components: [
-      { type: "box", position: [0, 0, 100, 100], width: 2, stroke: "#c0d0e0dd" },
-      { type: "text", position: [5, 5, 20, 90], value: "[L]", color: "#fff", align: "center" },
-      { type: "text", position: [30, 10, 65, 80], value: "Leave team", color: "#fff", align: "center" }
-    ]
-  }
-];
-
-var teamLists = [
-  {
-    id: "team_list_0",
-    position: [30, 25, 15, 45],
-    visible: true,
-    components: [
-      { type: "box", position: [0, 0, 100, 100], width: 2, stroke: "#c0d0e0dd" },
-      { type: "text", position: [5, 5, 90, 10], value: "", color: "#fff", align: "center" },
-    ]
-  },
-  {
-    id: "team_list_1",
-    position: [55, 25, 15, 45],
-    visible: true,
-    components: [
-      { type: "box", position: [0, 0, 100, 100], width: 2, stroke: "#c0d0e0dd" },
-      { type: "text", position: [5, 5, 90, 10], value: "", color: "#fff", align: "center" },
-    ]
-  }
-];
-
-var teamFull = {
-  id: "team_full",
-  position: [46, 40, 8, 4],
-  visible: true,
-  components: [
-    { type: "text", position: [0, 0, 100, 100], value: "Team is full", color: "#fff", align: "center" },
-  ]
-};
-
 var startMessage = {
   id: "start_message",
   position: [0, 0, 100, 100],
   visible: true,
   components: [
     { type: "text", position: [40, 30, 20, 10], value: "GO!", color: "#fff", align: "center" },
-    { type: "text", position: [10, 64, 80, 4], value: "Storm the point with your teammates and hold it for as long as possible against the other team!", color: "#ddd", align: "center" },
-    { type: "text", position: [10, 70, 80, 4], value: "The longer you are on the point and the more ships you have on it, the faster your team will gain score.", color: "#ddd", align: "center" },
+    { type: "text", position: [10, 60, 80, 4], value: "Storm the point with your teammates and hold it for as long as possible against the other team!", color: "#ddd", align: "center" },
+    { type: "text", position: [10, 65, 80, 4], value: "The longer you are on the point and the more ships you have on it, the faster your team will gain score.", color: "#ddd", align: "center" },
+    { type: "text", position: [10, 70, 80, 4], value: "Being further into the point will also improve your scoring amount.", color: "#ddd", align: "center" },
     { type: "text", position: [10, 76, 80, 4], value: "If the other team holds the point for too long and you can't seem to push them off of it,", color: "#ddd", align: "center" },
     { type: "text", position: [10, 81, 80, 4], value: "head to the center of the map, where there is a secondary weapon generator", color: "#ddd", align: "center" },
     { type: "text", position: [10, 86, 80, 4], value: "that will help increase your firepower.", color: "#ddd", align: "center" }
@@ -366,7 +285,7 @@ var objectivePoints = {
   position: [44, 30, 10, 7],
   visible: true,
   components: [
-    { type: "text", position: [0, 0, 100, 100], value: `+${pointsPerUnit}`, color: "#eeea5d", align: "center" }
+    { type: "text", position: [0, 0, 100, 100], value: "", color: "#eeea5d", align: "center" }
   ]
 };
 
@@ -409,28 +328,21 @@ var waiting = function (game) {
     waitingMessage.components[1].value = `Players: ${game.ships.length}/${playerCount}`;
     if (game.ships.length === playerCount) {
       modding.terminal.error("GAME: Enough ships are here");
+      setTeams(game);
       for (let ship of game.ships) {
         addToUIQueue(ship, { id: "waiting_message", visible: false });
+        addToUIQueue(ship, startMessage);
+        setTimeout(() => {
+          addToUIQueue(ship, { id: "start_message", visible: false });
+        }, 7000);
         setShipUI(ship);
+        spawnValues(game, ship);
       }
-      teamChooseButtons[0].components[0].fill = `hsla(${roundOptions.hues[0]},100%,25%,0.9)`;
-      teamChooseButtons[1].components[0].fill = `hsla(${roundOptions.hues[1]},100%,25%,0.9)`;
-      teamLists[0].components[0].fill = `hsla(${roundOptions.hues[0]},80%,25%,0.3)`;
-      teamLists[1].components[0].fill = `hsla(${roundOptions.hues[1]},80%,25%,0.3)`;
-      for (let [key, value] of Object.entries(hueNames)) {
-        if (value == roundOptions.hues[0]) {
-          teamLists[0].components[1].value = key + " Team";
-        } else if (value == roundOptions.hues[1]) {
-          teamLists[1].components[1].value = key + " Team";
-        }
-      }
-      for (let ship of game.ships) {
-        addToUIQueue(ship, teamLists[0]);
-        addToUIQueue(ship, teamLists[1]);
-      }
+      modding.terminal.error("GAME: Starting game!");
+      changePoint(game);
+      startWeaponGen(game);
       stepAdjust = game.step;
-      game.setOpen(false);
-      this.tick = teamChoose;
+      this.tick = mainGame;
     } else {
       for (let ship of game.ships) {
         ship.set({ idle: true, collider: false, x: (game.ships.indexOf(ship) - (game.ships.length - 1) / 2) * 10, y: 0, vx: 0, vy: 0, angle: 90, hue: 60 });
@@ -441,76 +353,21 @@ var waiting = function (game) {
   }
 };
 
-var teamChoose = function (game) {
-  if (game.step - stepAdjust >= teamChooseLength * 60) {
-    setTeams(game);
-    hideTeamChooseUI(game);
-    for (let ship of game.ships) {
-      addToUIQueue(ship, startMessage);
-      setTimeout(() => {
-        addToUIQueue(ship, { id: "start_message", visible: false });
-      }, 7000);
-      spawnValues(ship);
-    }
-    stepAdjust = game.step;
-    modding.terminal.error("GAME: Starting game!");
-    changePoint(game);
-    startWeaponGen(game);
-    this.tick = mainGame;
-  } else {
-    if (game.step % 60 === 0) {
-      teamChooseCountdown.components[1].value = formatTime(teamChooseLength - Math.round((game.step - stepAdjust) / 60));
-      for (let ship of game.ships) {
-        addToUIQueue(ship, teamChooseCountdown);
-        setShipUI(ship);
-      }
-    }
-    if (game.step % 12 === 0) {
-      for (let ship of game.ships) {
-        if (ship.custom.team != "none") {
-          ship.set({ idle: true, collider: false, x: (game.ships.indexOf(ship) - (game.ships.length - 1) / 2) * 10, y: 0, vx: 0, vy: 0, angle: 90, hue: roundOptions.hues[ship.custom.team] });
-        } else {
-          ship.set({ idle: true, collider: false, x: (game.ships.indexOf(ship) - (game.ships.length - 1) / 2) * 10, y: 0, vx: 0, vy: 0, angle: 90, hue: 60 });
-        }
-        addToUIQueue(ship, teamLists[0]);
-        addToUIQueue(ship, teamLists[1]);
-        addToUIQueue(ship, teamChooseButtons[0]);
-        addToUIQueue(ship, teamChooseButtons[1]);
-        addToUIQueue(ship, teamChooseButtons[2]);
-        setShipUI(ship);
-      }
-      if (!updatingList) {
-        updateTeamLists(game);
-      }
-      teamCounts = [0, 0];
-      for (let s of game.ships) {
-        typeof s.custom.team == "number" && (teamCounts[s.custom.team]++);
-      }
-      if (shipCount < game.ships.length || game.ships.length < playerCount) {
-        hideTeamChooseUI(game);
-        this.tick = waiting;
-      }
-      shipCount = game.ships.length;
-    }
-  }
-};
-
 var mainGame = function (game) {
   if (game.step % pointTimeUnit === 0) {
     for (let ship of game.ships) {
       if (ship.custom.inPoint) {
-        teamScores[ship.custom.team] += pointsPerUnit;
-        ship.custom.score += pointsPerUnit;
+        teamScores[ship.custom.team] += ship.custom.inPoint;
+        ship.custom.score += ship.custom.inPoint;
+        objectivePoints.components[0].value = "+" + ship.custom.inPoint;
         addToUIQueue(ship, objectivePoints);
+        setTimeout(() => {
+            addToUIQueue(ship, { id: "objective_points", visible: false });
+            setShipUI(ship);
+        }, pointTimeUnit / 60 * 1000 / 2);
         setShipUI(ship);
       }
     }
-    setTimeout(() => {
-      for (let ship of game.ships) {
-        addToUIQueue(ship, { id: "objective_points", visible: false });
-        setShipUI(ship);
-      }
-    }, pointTimeUnit / 60 * 1000 / 2);
   }
   if (game.step % 6 === 0) {
     for (let ship of game.ships) {
@@ -533,7 +390,7 @@ var mainGame = function (game) {
         if (ship.custom.team == "none") {
           ship.custom.team = teamCounts[0] < teamCounts[1] ? 0 : 1;
           ship.set({ team: ship.custom.team });
-          spawnValues(ship);
+          spawnValues(game, ship);
         }
       }
     }
@@ -574,21 +431,36 @@ var mainGame = function (game) {
 
 var changePoint = function (game) {
   modding.terminal.error("GAME: Changing point.");
-  game.setObject({
-    id: "point",
+  let point = {
+    id: "point_0",
     type: pointObj,
     position: { x: pointLocs[pointsSoFar][0], y: pointLocs[pointsSoFar][1], z: -5 },
     rotation: { x: (90 * Math.PI) / 180, y: 0, z: 0 },
     scale: { x: pointSize[0] * 0.5, y: 1, z: pointSize[1] * 0.5 }
-  });
-  removeRadarEl("point");
-  addRadarEl("point", pointLocs[pointsSoFar][0], pointLocs[pointsSoFar][1], pointSize[0], pointSize[1], 58, 85, 65, 0.4, "box");
+  }
+  pointObj.diffuseColor = 0xeeea5d;
+  game.setObject(point);
+  point.id = "point_1";
+  pointObj.diffuseColor = 0x00ff33;
+  point.scale = { x: pointSize[0] * 0.35, y: 1, z: pointSize[1] * 0.35 };
+  game.setObject(point);
+  point.id = "point_2";
+  pointObj.diffuseColor = 0x0088ff;
+  point.scale = { x: pointSize[0] * 0.2, y: 1, z: pointSize[1] * 0.2 };
+  game.setObject(point);
+  removeRadarEl("point_0");
+  removeRadarEl("point_1");
+  removeRadarEl("point_2");
+  addRadarEl("point_0", pointLocs[pointsSoFar][0], pointLocs[pointsSoFar][1], pointSize[0], pointSize[1], 58, 85, 65, 0, "box");
+  addRadarEl("point_1", pointLocs[pointsSoFar][0], pointLocs[pointsSoFar][1], pointSize[0] * 0.7, pointSize[1] * 0.7, 132, 85, 65, 0.15, "box");
+  addRadarEl("point_2", pointLocs[pointsSoFar][0], pointLocs[pointsSoFar][1], pointSize[0] * 0.4, pointSize[1] * 0.4, 204, 85, 65, 0.3, "box");
   pointsSoFar += 1;
 };
 
 var gameOver = function (game) {
   let winnerColor, loserColor;
   stopWeaponGen(game);
+  game.removeObject();
   for (let [key, value] of Object.entries(hueNames)) {
     if (value == roundOptions.hues[teamScores.indexOf(Math.max(...teamScores))]) {
       winnerColor = key;
@@ -651,15 +523,15 @@ var startWeaponGen = function (game) {
     rotation: { x: 0, y: 0, z: 0 },
     scale: { x: 12, y: 12, z: 12 }
   });
-  addRadarEl("weapon_gen", 0, 0, 50, 50, 0, 100, 60, 0.25, "round");
+  addRadarEl("weapon_gen", 0, 0, 55, 55, 0, 100, 60, 0.25, "round");
   weaponGenInterval = setInterval(() => {
     if (game.collectibles.length <= 5) {
       let random = Math.random();
-      if (random < 0.35) {
+      if (random < 0.4) {
         game.addCollectible({ code: 10, x: 0, y: 0 });
-      } else if (random < 0.7) {
+      } else if (random < 0.55) {
         game.addCollectible({ code: 20, x: 0, y: 0 });
-      } else if (random < 0.85) {
+      } else if (random < 0.9) {
         game.addCollectible({ code: 11, x: 0, y: 0 });
       } else if (random < 0.95) {
         game.addCollectible({ code: 21, x: 0, y: 0 });
@@ -667,7 +539,7 @@ var startWeaponGen = function (game) {
         game.addCollectible({ code: 12, x: 0, y: 0 });
       }
     }
-  }, 5000);
+  }, 4000);
 };
 
 var stopWeaponGen = function (game) {
@@ -690,24 +562,6 @@ var setShipUI = function (ship) {
     ship.setUIComponent(component);
   }
   clearUIQueue(ship);
-};
-
-var hideTeamChooseUI = function (game) {
-  let maxId = 1;
-  for (let ship of game.ships) {
-    addToUIQueue(ship, { id: "team_choose_countdown", visible: false });
-    addToUIQueue(ship, { id: "team_choose_button_0", visible: false });
-    addToUIQueue(ship, { id: "team_choose_button_1", visible: false });
-    addToUIQueue(ship, { id: "leave_team", visible: false });
-    addToUIQueue(ship, { id: "team_list_0", visible: false });
-    addToUIQueue(ship, { id: "team_list_1", visible: false });
-    ship.id > maxId && (maxId = ship.id);
-  }
-  for (let i = 1; i <= maxId; i++) {
-    for (let ship of game.ships) {
-      addToUIQueue(ship, {id: "player_list_" + i, visible: false});
-    }
-  }
 };
 
 var shipInit = function (ship) {
@@ -750,7 +604,7 @@ var addRadarEl = function (id, x, y, width, height, hue, sat, light, alpha, type
   };
   if (type == "box" || type == "round") {
     el.width = 1;
-    el.stroke = `hsla(${hue},${sat}%,${light}%,${alpha + 0.25})`
+    el.stroke = `hsla(${hue},${sat}%,${light}%,${alpha + 0.4})`
   }
   radarBackground.components.push(el);
 };
@@ -764,11 +618,20 @@ var removeRadarEl = function (id) {
   }
 };
 
-var spawnValues = function (ship) {
+var spawnValues = function (game, ship) {
   modding.terminal.error(`GAME: Ship with name ${ship.name} has been respawned.`);
-  ship.set({ idle: false, collider: true, crystals: 720 * crystalsToGive, x: spawns[ship.custom.team][0], y: spawns[ship.custom.team][1], vx: 0, vy: 0, type: 600 + currentType, stats: 77777777 });
-  currentType++;
-  currentType > Object.keys(shipSets[roundOptions.ship_set]).length && (currentType = 1);
+  setCurrentType(game);
+  ship.set({ idle: false, collider: true, crystals: 720 * crystalsToGive, x: spawns[ship.custom.team][0], y: spawns[ship.custom.team][1], vx: 0, vy: 0, type: 600 + currentTypes[ship.custom.team], stats: 77777777 });
+  currentTypes[ship.custom.team]++;
+};
+
+var setCurrentType = function (game) {
+  for (let ship of game.ships) {
+    if (currentTypes[ship.custom.team] == ship.type - 600) {
+      currentTypes[ship.custom.team]++;
+      currentTypes[ship.custom.team] > Object.keys(shipSets[roundOptions.ship_set]).length && (currentTypes[ship.custom.team] = 1);
+    }
+  }
 };
 
 var showShipChoices = function (game, ship, changeButton = true) {
@@ -807,18 +670,15 @@ var checkSpawn = function (ship) {
 };
 
 var checkPoint = function (ship) {
-  if (isInRange((pointLocs[pointsSoFar - 1][0] - (pointSize[0] / 2)), (pointLocs[pointsSoFar - 1][0] + (pointSize[0] / 2)), ship.x) && isInRange((pointLocs[pointsSoFar - 1][1] - (pointSize[1] / 2)), (pointLocs[pointsSoFar - 1][1] + (pointSize[1] / 2)), ship.y)) {
-    ship.custom.inPoint = true;
+  if (isInRange(pointLocs[pointsSoFar - 1][0] - (pointSize[0] / 2) * 0.4, pointLocs[pointsSoFar - 1][0] + (pointSize[0] / 2) * 0.4, ship.x) && isInRange(pointLocs[pointsSoFar - 1][1] - (pointSize[1] / 2) * 0.4, pointLocs[pointsSoFar - 1][1] + (pointSize[1] / 2) * 0.4, ship.y)) {
+    ship.custom.inPoint = pointsPerUnit;
+  } else if (isInRange(pointLocs[pointsSoFar - 1][0] - (pointSize[0] / 2) * 0.7, pointLocs[pointsSoFar - 1][0] + (pointSize[0] / 2) * 0.7, ship.x) && isInRange(pointLocs[pointsSoFar - 1][1] - (pointSize[1] / 2) * 0.7, pointLocs[pointsSoFar - 1][1] + (pointSize[1] / 2) * 0.7, ship.y)) {
+    ship.custom.inPoint = pointsPerUnit * 0.5;
+  } else if (isInRange(pointLocs[pointsSoFar - 1][0] - (pointSize[0] / 2), pointLocs[pointsSoFar - 1][0] + (pointSize[0] / 2), ship.x) && isInRange(pointLocs[pointsSoFar - 1][1] - (pointSize[1] / 2), pointLocs[pointsSoFar - 1][1] + (pointSize[1] / 2), ship.y)) {
+    ship.custom.inPoint = pointsPerUnit * 0.2;
   } else {
     ship.custom.inPoint = false;
   }
-};
-
-var teamFullMsg = function (ship) {
-  addToUIQueue(ship, teamFull);
-  setTimeout(() => {
-    addToUIQueue(ship, { id: "team_full", visible: false });
-  }, 1500);
 };
 
 var setTeams = function (game) {
@@ -834,33 +694,6 @@ var setTeams = function (game) {
     }
     ship.set({ team: ship.custom.team });
   }
-};
-
-var updateTeamLists = function (game) {
-  updatingList = true;
-  playerUICounts = [0, 0];
-  for (let ship of game.ships) {
-    if (ship.custom.team != "none") {
-      let pos = [31 + ship.custom.team * 25, 36.25 + playerUICounts[ship.custom.team] * playerYScale, 13, playerYScale * 0.7];
-      let c = {
-        id: "player_list_" + ship.id,
-        position: pos,
-        visible: true,
-        components: [
-          {type: "player", position: [0, 0, 100, 100], id: ship.id, color: "#fff", align: "left"}
-        ]
-      };
-      playerUICounts[ship.custom.team]++;
-      for (let s of game.ships) {
-        addToUIQueue(s, c);
-      }
-    } else {
-      for (let s of game.ships) {
-        addToUIQueue(s, { id: "player_list_" + ship.id, visible: false });
-      }
-    }
-  }
-  updatingList = false;
 };
 
 var checkTeamShips = function (game, eventShip) {
@@ -890,8 +723,8 @@ var checkTeamShips = function (game, eventShip) {
 var roundOptions = {
   hues: hues[randomChoice(hues)],
   soundtrack: soundtracks[randomChoice(soundtracks)],
-  ship_set: randomChoice(shipSets),
-  // ship_set: "Albie__Morrison_Insect__Set"
+  // ship_set: randomChoice(shipSets),
+  ship_set: "Pulse_Class__Pulse"
 };
 
 roundOptions.ship_array = Object.values(shipSets[roundOptions.ship_set]);
@@ -936,13 +769,13 @@ this.event = function (event, game) {
     switch (event.name) {
       case "ship_spawned":
         if (!ship.custom.init) {
-          if (game.ships.length > playerCount) {
+          if (game.ships.length > maxPlayers) {
             ship.gameover({ "Game is full": "" });
           } else {
             shipInit(ship);
           }
         } else {
-          spawnValues(ship);
+          spawnValues(game, ship);
         }
         break;
       case "ship_destroyed":
@@ -960,17 +793,6 @@ this.event = function (event, game) {
           } else {
             ship.set({ type: code, stats: 77777777, healing: false });
           }
-        } else if (component.substr(0, 19) == "team_choose_button_") {
-          let team = parseInt(component.charAt(component.length - 1));
-          if (teamCounts[team] < Math.ceil(playerCount / 2)) {
-            if (ship.custom.team != "none") {
-              teamCounts[ship.custom.team]--;
-            }
-            teamCounts[team]++;
-            ship.custom.team = team;
-          } else {
-            teamFullMsg(ship);
-          }
         } else {
           switch (component) {
             case "ship_choose_button":
@@ -979,10 +801,6 @@ this.event = function (event, game) {
               } else {
                 showShipChoices(game, ship, true);
               }
-              break;
-            case "leave_team":
-              if (ship.custom.team != "none") teamCounts[ship.custom.team]--;
-              ship.custom.team = "none";
               break;
           }
         }
