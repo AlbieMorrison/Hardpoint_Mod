@@ -125,9 +125,24 @@ const vocabulary = [
 ];
 
 var pointObj = {
-  id: "point_obj",
+  id: "point_obj_0",
   obj: "https://raw.githubusercontent.com/AlbieMorrison/Hardpoint_Mod/main/point.obj",
-  diffuse: "https://raw.githubusercontent.com/AlbieMorrison/Hardpoint_Mod/main/emissive_2.jpg"
+  diffuse: "https://raw.githubusercontent.com/AlbieMorrison/Hardpoint_Mod/main/emissive_2.jpg",
+  diffuseColor: 0xeeea5d
+};
+
+var pointObj1 = {
+  id: "point_obj_1",
+  obj: "https://raw.githubusercontent.com/AlbieMorrison/Hardpoint_Mod/main/point.obj",
+  diffuse: "https://raw.githubusercontent.com/AlbieMorrison/Hardpoint_Mod/main/emissive_2.jpg",
+  diffuseColor: 0x00ff33
+};
+
+var pointObj2 = {
+  id: "point_obj_2",
+  obj: "https://raw.githubusercontent.com/AlbieMorrison/Hardpoint_Mod/main/point.obj",
+  diffuse: "https://raw.githubusercontent.com/AlbieMorrison/Hardpoint_Mod/main/emissive_2.jpg",
+  diffuseColor: 0x0088ff
 };
 
 var weaponGenObj = {
@@ -139,9 +154,9 @@ var weaponGenObj = {
 };
 
 var soundtracks = ["procedurality.mp3", "warp_drive.mp3", "crystals.mp3", "red_mist.mp3", "civilisation.mp3", "argon.mp3"];
-var playerCount = 8; // number of players to wait for before game start, this will be rounded up to the nearest even number.
+var playerCount = 2; // number of players to wait for before game start, this will be rounded up to the nearest even number.
 var maxPlayers = 20;
-var crystalsToGive = 0.5; // multiplier on max crystals to give to ship when it respawns
+var crystalsToGive = 0.25; // multiplier on max crystals to give to ship when it respawns
 var mapSize = 120;
 var gameLength = 720; // in seconds
 var gameLeft = JSON.parse(JSON.stringify(gameLength));
@@ -163,7 +178,6 @@ var hueNames = {
 };
 var teamScores = [0, 0];
 var teamCounts = [0, 0];
-var playerUICounts = [0, 0];
 
 var spawns = [[-mapSize * 3.5, 0], [mapSize * 3.5, 0]];
 var spawnSize = [60, 60];
@@ -431,30 +445,34 @@ var mainGame = function (game) {
 
 var changePoint = function (game) {
   modding.terminal.error("GAME: Changing point.");
-  let point = {
+  game.setObject({
     id: "point_0",
     type: pointObj,
     position: { x: pointLocs[pointsSoFar][0], y: pointLocs[pointsSoFar][1], z: -5 },
     rotation: { x: (90 * Math.PI) / 180, y: 0, z: 0 },
     scale: { x: pointSize[0] * 0.5, y: 1, z: pointSize[1] * 0.5 }
-  }
-  pointObj.diffuseColor = 0xeeea5d;
-  game.setObject(point);
-  point.id = "point_1";
-  pointObj.diffuseColor = 0x00ff33;
-  point.scale = { x: pointSize[0] * 0.35, y: 1, z: pointSize[1] * 0.35 };
-  game.setObject(point);
-  point.id = "point_2";
-  pointObj.diffuseColor = 0x0088ff;
-  point.scale = { x: pointSize[0] * 0.2, y: 1, z: pointSize[1] * 0.2 };
-  game.setObject(point);
+  });
+  game.setObject({
+    id: "point_1",
+    type: pointObj1,
+    position: { x: pointLocs[pointsSoFar][0], y: pointLocs[pointsSoFar][1], z: -5 },
+    rotation: { x: (90 * Math.PI) / 180, y: 0, z: 0 },
+    scale: { x: pointSize[0] * 0.3, y: 1, z: pointSize[1] * 0.3 }
+  });
+  game.setObject({
+    id: "point_2",
+    type: pointObj2,
+    position: { x: pointLocs[pointsSoFar][0], y: pointLocs[pointsSoFar][1], z: -5 },
+    rotation: { x: (90 * Math.PI) / 180, y: 0, z: 0 },
+    scale: { x: pointSize[0] * 0.15, y: 1, z: pointSize[1] * 0.15 }
+  });
   removeRadarEl("point_0");
   removeRadarEl("point_1");
   removeRadarEl("point_2");
   addRadarEl("point_0", pointLocs[pointsSoFar][0], pointLocs[pointsSoFar][1], pointSize[0], pointSize[1], 58, 85, 65, 0, "box");
-  addRadarEl("point_1", pointLocs[pointsSoFar][0], pointLocs[pointsSoFar][1], pointSize[0] * 0.7, pointSize[1] * 0.7, 132, 85, 65, 0.15, "box");
-  addRadarEl("point_2", pointLocs[pointsSoFar][0], pointLocs[pointsSoFar][1], pointSize[0] * 0.4, pointSize[1] * 0.4, 204, 85, 65, 0.3, "box");
-  pointsSoFar += 1;
+  addRadarEl("point_1", pointLocs[pointsSoFar][0], pointLocs[pointsSoFar][1], pointSize[0] * 0.6, pointSize[1] * 0.6, 132, 85, 65, 0.15, "box");
+  addRadarEl("point_2", pointLocs[pointsSoFar][0], pointLocs[pointsSoFar][1], pointSize[0] * 0.3, pointSize[1] * 0.3, 204, 85, 65, 0.3, "box");
+  pointsSoFar++;
 };
 
 var gameOver = function (game) {
