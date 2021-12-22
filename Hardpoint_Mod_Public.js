@@ -157,7 +157,7 @@ var soundtracks = ["procedurality.mp3", "warp_drive.mp3", "crystals.mp3", "red_m
 var playerCount = 8; // number of players to wait for before game start, this will be rounded up to the nearest even number.
 var maxPlayers = 20;
 var crystalsToGive = 0.25; // multiplier on max crystals to give to ship when it respawns
-var mapSize = 130;
+var mapSize = 120;
 var gameLength = 720; // in seconds
 var gameLeft = JSON.parse(JSON.stringify(gameLength));
 var pointsPerUnit = 10;
@@ -183,7 +183,7 @@ var spawns = [[-mapSize * 3.5, 0], [mapSize * 3.5, 0]];
 var spawnSize = [60, 60];
 
 var pointLocs = [[-mapSize * 1.25, mapSize * 1.5], [mapSize * 1.25, -mapSize * 1.5], [-mapSize * 1.25, -mapSize * 1.5], [mapSize * 1.25, mapSize * 1.5], [0, -mapSize * 2], [0, mapSize * 2]];
-var pointSize = [120, 120];
+var pointSize = [110, 110];
 var pointsSoFar = 0;
 var shipCount = 0;
 
