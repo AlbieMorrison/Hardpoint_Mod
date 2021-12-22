@@ -79,18 +79,18 @@ const shipSets = {
     Support: Hellfire,
     Rammer: U_Smasher
   },
-  Albie__Morrison_Insect__Set: {
-    Assault: Stinkbug,
-    Heavy: Hornet,
-    Medic: Butterfly,
-    Bomber: Bombardier_Beetle,
-    Pulsar: Click_Beetle,
-    Sniper: Stick_Bug,
-    Special: Mosquito,
-    Speedster: Horsefly,
-    Support: Dragonfly,
-    Rammer: Grasshopper
-  },
+  // Albie__Morrison_Insect__Set: {
+  //   Assault: Stinkbug,
+  //   Heavy: Hornet,
+  //   Medic: Butterfly,
+  //   Bomber: Bombardier_Beetle,
+  //   Pulsar: Click_Beetle,
+  //   Sniper: Stick_Bug,
+  //   Special: Mosquito,
+  //   Speedster: Horsefly,
+  //   Support: Dragonfly,
+  //   Rammer: Grasshopper
+  // },
   Pulse_Class__Pulse: {
     Assault: Kilofarad,
     Heavy: Mandrill,
@@ -154,10 +154,10 @@ var weaponGenObj = {
 };
 
 var soundtracks = ["procedurality.mp3", "warp_drive.mp3", "crystals.mp3", "red_mist.mp3", "civilisation.mp3", "argon.mp3"];
-var playerCount = 2; // number of players to wait for before game start, this will be rounded up to the nearest even number.
+var playerCount = 8; // number of players to wait for before game start, this will be rounded up to the nearest even number.
 var maxPlayers = 20;
 var crystalsToGive = 0.25; // multiplier on max crystals to give to ship when it respawns
-var mapSize = 120;
+var mapSize = 130;
 var gameLength = 720; // in seconds
 var gameLeft = JSON.parse(JSON.stringify(gameLength));
 var pointsPerUnit = 10;
@@ -183,7 +183,7 @@ var spawns = [[-mapSize * 3.5, 0], [mapSize * 3.5, 0]];
 var spawnSize = [60, 60];
 
 var pointLocs = [[-mapSize * 1.25, mapSize * 1.5], [mapSize * 1.25, -mapSize * 1.5], [-mapSize * 1.25, -mapSize * 1.5], [mapSize * 1.25, mapSize * 1.5], [0, -mapSize * 2], [0, mapSize * 2]];
-var pointSize = [100, 100];
+var pointSize = [120, 120];
 var pointsSoFar = 0;
 var shipCount = 0;
 
@@ -457,21 +457,21 @@ var changePoint = function (game) {
     type: pointObj1,
     position: { x: pointLocs[pointsSoFar][0], y: pointLocs[pointsSoFar][1], z: -5 },
     rotation: { x: (90 * Math.PI) / 180, y: 0, z: 0 },
-    scale: { x: pointSize[0] * 0.3, y: 1, z: pointSize[1] * 0.3 }
+    scale: { x: pointSize[0] * 0.25, y: 1, z: pointSize[1] * 0.25 }
   });
   game.setObject({
     id: "point_2",
     type: pointObj2,
     position: { x: pointLocs[pointsSoFar][0], y: pointLocs[pointsSoFar][1], z: -5 },
     rotation: { x: (90 * Math.PI) / 180, y: 0, z: 0 },
-    scale: { x: pointSize[0] * 0.15, y: 1, z: pointSize[1] * 0.15 }
+    scale: { x: pointSize[0] * 0.1, y: 1, z: pointSize[1] * 0.1 }
   });
   removeRadarEl("point_0");
   removeRadarEl("point_1");
   removeRadarEl("point_2");
   addRadarEl("point_0", pointLocs[pointsSoFar][0], pointLocs[pointsSoFar][1], pointSize[0], pointSize[1], 58, 85, 65, 0, "box");
-  addRadarEl("point_1", pointLocs[pointsSoFar][0], pointLocs[pointsSoFar][1], pointSize[0] * 0.6, pointSize[1] * 0.6, 132, 85, 65, 0.15, "box");
-  addRadarEl("point_2", pointLocs[pointsSoFar][0], pointLocs[pointsSoFar][1], pointSize[0] * 0.3, pointSize[1] * 0.3, 204, 85, 65, 0.3, "box");
+  addRadarEl("point_1", pointLocs[pointsSoFar][0], pointLocs[pointsSoFar][1], pointSize[0] * 0.5, pointSize[1] * 0.5, 132, 85, 65, 0.15, "box");
+  addRadarEl("point_2", pointLocs[pointsSoFar][0], pointLocs[pointsSoFar][1], pointSize[0] * 0.2, pointSize[1] * 0.2, 204, 85, 65, 0.3, "box");
   pointsSoFar++;
 };
 
@@ -688,9 +688,9 @@ var checkSpawn = function (ship) {
 };
 
 var checkPoint = function (ship) {
-  if (isInRange(pointLocs[pointsSoFar - 1][0] - (pointSize[0] / 2) * 0.4, pointLocs[pointsSoFar - 1][0] + (pointSize[0] / 2) * 0.4, ship.x) && isInRange(pointLocs[pointsSoFar - 1][1] - (pointSize[1] / 2) * 0.4, pointLocs[pointsSoFar - 1][1] + (pointSize[1] / 2) * 0.4, ship.y)) {
+  if (isInRange(pointLocs[pointsSoFar - 1][0] - (pointSize[0] / 2) * 0.2, pointLocs[pointsSoFar - 1][0] + (pointSize[0] / 2) * 0.2, ship.x) && isInRange(pointLocs[pointsSoFar - 1][1] - (pointSize[1] / 2) * 0.2, pointLocs[pointsSoFar - 1][1] + (pointSize[1] / 2) * 0.2, ship.y)) {
     ship.custom.inPoint = pointsPerUnit;
-  } else if (isInRange(pointLocs[pointsSoFar - 1][0] - (pointSize[0] / 2) * 0.7, pointLocs[pointsSoFar - 1][0] + (pointSize[0] / 2) * 0.7, ship.x) && isInRange(pointLocs[pointsSoFar - 1][1] - (pointSize[1] / 2) * 0.7, pointLocs[pointsSoFar - 1][1] + (pointSize[1] / 2) * 0.7, ship.y)) {
+  } else if (isInRange(pointLocs[pointsSoFar - 1][0] - (pointSize[0] / 2) * 0.5, pointLocs[pointsSoFar - 1][0] + (pointSize[0] / 2) * 0.5, ship.x) && isInRange(pointLocs[pointsSoFar - 1][1] - (pointSize[1] / 2) * 0.5, pointLocs[pointsSoFar - 1][1] + (pointSize[1] / 2) * 0.5, ship.y)) {
     ship.custom.inPoint = pointsPerUnit * 0.5;
   } else if (isInRange(pointLocs[pointsSoFar - 1][0] - (pointSize[0] / 2), pointLocs[pointsSoFar - 1][0] + (pointSize[0] / 2), ship.x) && isInRange(pointLocs[pointsSoFar - 1][1] - (pointSize[1] / 2), pointLocs[pointsSoFar - 1][1] + (pointSize[1] / 2), ship.y)) {
     ship.custom.inPoint = pointsPerUnit * 0.2;
@@ -769,7 +769,7 @@ this.options = {
   reset_tree: true,
   map_size: mapSize,
   soundtrack: roundOptions.soundtrack,
-  max_players: 20,
+  max_players: maxPlayers,
   friendly_colors: 2,
   asteroids_strength: 1,
   crystal_drop: 0.25,
@@ -778,7 +778,8 @@ this.options = {
   vocabulary: vocabulary,
   starting_ship: 801,
   speed_mod: 1.25,
-  healing_ratio: 0.5
+  healing_ratio: 0.4,
+  radar_zoom: 1
 };
 
 this.event = function (event, game) {
