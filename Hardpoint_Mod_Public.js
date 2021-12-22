@@ -1,4 +1,4 @@
-// STARBLAST.IO HARDPOINT MOD v1.0
+// STARBLAST.IO HARDPOINT MOD v1.1
 // AlbieMorrison © 2021
 
 /*
