@@ -155,7 +155,7 @@ var weaponGenObj = {
 
 var soundtracks = ["procedurality.mp3", "warp_drive.mp3", "crystals.mp3", "red_mist.mp3", "civilisation.mp3", "argon.mp3"];
 var playerCount = 8; // number of players to wait for before game start, this will be rounded up to the nearest even number.
-var maxPlayers = 20;
+var maxPlayers = 16;
 var crystalsToGive = 0.25; // multiplier on max crystals to give to ship when it respawns
 var mapSize = 120;
 var gameLength = 720; // in seconds
