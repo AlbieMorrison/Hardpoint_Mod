@@ -779,7 +779,7 @@ this.options = {
   starting_ship: 801,
   speed_mod: 1.25,
   healing_ratio: 0.4,
-  radar_zoom: 1
+  radar_zoom: 2
 };
 
 this.event = function (event, game) {
