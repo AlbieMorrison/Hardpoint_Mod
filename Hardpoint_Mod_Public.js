@@ -4,7 +4,7 @@
 /*
 All coding was done by AlbieMorrison.
 
-Thanks to AlbieMorrison, Neuronality, Finalizer, Pulse, AceDiggety, and Theta for making ship sets for this mod!
+Thanks to Neuronality, Finalizer, Pulse, AceDiggety, and Theta for making ship sets for this mod!
 Thanks to AceDiggety for some graphics-related ideas.
 */
 
