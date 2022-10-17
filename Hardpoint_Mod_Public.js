@@ -1,5 +1,5 @@
 // STARBLAST.IO HARDPOINT MOD v1.1
-// AlbieMorrison © 2021
+// AlbieMorrison © 2022
 
 /*
 All coding was done by AlbieMorrison.
